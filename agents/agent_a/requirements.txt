@@ -1,3 +1,5 @@
 pika
 redis
-pytest 
+pytest
+transformers
+torch 
