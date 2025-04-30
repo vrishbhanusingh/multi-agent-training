@@ -1,0 +1,199 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- **Required Rule Structure:**
+  ```markdown
+  ---
+  description: Clear, one-line description of what the rule enforces
+  globs: path/to/files/*.ext, other/path/**/*
+  alwaysApply: boolean
+  ---
+
+  - **Main Points in Bold**
+    - Sub-points with details
+    - Examples and explanations
+  ```
+
+- **File References:**
+  - Use `@filename` (@filename) to reference files
+  - Example: @prisma.mdc for rule references
+  - Example: @schema.prisma for code references
+
+- **Code Examples:**
+  - Use language-specific code blocks
+  ```typescript
+  // ✅ DO: Show good examples
+  const goodExample = true;
+  
+  // ❌ DON'T: Show anti-patterns
+  const badExample = false;
+  ```
+
+- **Rule Content Guidelines:**
+  - Start with high-level overview
+  - Include specific, actionable requirements
+  - Show examples of correct implementation
+  - Reference existing code when possible
+  - Keep rules DRY by referencing other rules
+
+- **Rule Maintenance:**
+  - Update rules when new patterns emerge
+  - Add examples from actual codebase
+  - Remove outdated patterns
+  - Cross-reference related rules
+
+- **Best Practices:**
+  - Use bullet points for clarity
+  - Keep descriptions concise
+  - Include both DO and DON'T examples
+  - Reference actual code over theoretical examples
+  - Use consistent formatting across rules 
+
+---
+description: Use sequential thinking for responses, balancing quality and efficiency
+globs: *
+alwaysApply: true
+---
+
+- **Use Sequential Thinking MCP tool**
+  - Default to concise, constrained thinking using the MCP tool sequential-thinking (e.g., limit to 1-2 reasoning steps or 100 words) for routine or straightforward queries.
+    - Example prompt: “Think step-by-step, but keep your explanation under 100 words.”
+    - Use Chain of Draft (CoD) style for short, dense reasoning when possible.
+  - Use full, detailed thinking using the MCP tool sequential-thinking only for complex, ambiguous, or critical queries.
+    - Example: Multi-step planning, debugging, or when explicitly requested.
+  - **For all responses Use MCP tool sequential-thinking** in either concise mode or full mode.
+
+- **When to Use Each Mode**
+  - **Concise/Constrained:** Most coding, lookup, or simple implementation tasks(use 1-2 reasoning steps using the mcp tool sequential-thinking).
+  - **Full Sequential:** Complex design, architecture, or when interpretability is critical(Use full, detailed thinking using the MCP tool sequential-thinking).
+
+- **Best Practices**
+  - Reference actual code and documentation links in implementation notes.
+  - Proactively check docs before making assumptions.
+  - Use either concise mode or full mode for the MCP tool sequential-thinking for all responses.
+
+- **Examples**
+  ```typescript
+  // ✅ DO: Use concise sequential thinking for simple tasks
+  // Step 1: Identify the function to edit. Step 2: Add the new parameter.
+
+  // ✅ DO: Use full sequential thinking for complex, multi-step problems
+  // Step 1: Analyze requirements. Step 2: Identify dependencies. Step 3: Plan implementation.
+  ```
+---
+---
+description: Always Use Context7 for Documentation Lookup
+globs: *
+alwaysApply: true
+---
+- **Always Use Context7 for Documentation Lookup**
+    - Use Context7 tools to check official documentation when:
+        - Working with external libraries, frameworks, or APIs
+        - Unfamiliar with a function, class, or method
+        - Needing to verify usage, parameters, or best practices
+    - **How to Use:**
+        - First, resolve the library ID with `resolve-library-id`
+        - Then, fetch documentation with `get-library-docs`
+    - Reference actual code and documentation links in implementation notes
+    - Example:
+        ```typescript
+        // ✅ DO: Use Context7 to check the correct usage of a library function
+        ```
+    - **Best Practices**
+    - Proactively check docs before making assumptions
+    - Reference documentation in code comments or task notes
+    - Update this rule as new documentation tools or workflows are adopted
+
+---
+---
+description: Guide strategic use of web search for external, current, conceptual, or specific information, balancing software dev and research needs.
+globs: *
+alwaysApply: true
+---
+
+- **Use Web Search Strategically: Look Externally First**
+  - Prioritize web search when information is likely outside the current project codebase, not available via Context7, or requires up-to-the-minute data or broad community context.
+
+- **When to Use Web Search:**
+  - **Current Information & Updates:** Checking latest library versions, breaking changes, security notices, or state-of-the-art developments.
+    ```
+    // ✅ DO: Search "latest pandas 2.x API changes"
+    // ✅ DO: Search "state of the art object detection models 2024"
+    ```
+  - **Specific Error Messages:** Investigating unique errors not resolved by internal context.
+    ```
+    // ✅ DO: Search "pytorch CUDA error: device-side assert triggered"
+    ```
+  - **External APIs & Services:** Finding docs, examples, or troubleshooting for third-party tools.
+    ```
+    // ✅ DO: Search "using Weights & Biases API with Slurm"
+    ```
+  - **Conceptual Understanding & Research:** Exploring algorithms, concepts, or details from academic papers or theoretical sources.
+    ```
+    // ✅ DO: Search "explanation of variational autoencoder loss function"
+    // ✅ DO: Search "implementation of algorithm X from paper Y github"
+    // ✅ DO: Search "comparison of Adam vs RMSprop optimizers paper"
+    // ✅ DO: Search "interpreting SHAP values for gradient boosting models"
+    ```
+  - **Verification & Niche Details:** Confirming compatibility, specific configurations, or technical details not in standard docs.
+    ```
+    // ✅ DO: Search "does tensorflow 2.15 support CUDA 12.2"
+    ```
+  - **Broad Initial Exploration:** Getting an overview of unfamiliar technologies or techniques.
+    ```
+    // ✅ DO: Search "introduction to reinforcement learning Q-learning"
+    ```
+
+- **When to Prefer Other Tools (Use Internal/Dedicated Tools First):**
+  - **Project Code:** Use `codebase_search` (semantic) or `grep_search` (exact) to find code *within this project*.
+    ```
+    // ❌ DON'T: Web search for a function defined locally -> Use codebase_search.
+    ```
+  - **Official Library Docs:** Use **Context7** (`resolve-library-id` -> `get-library-docs`) *first* for standard usage of known libraries/frameworks (e.g., React, pandas, PyTorch). See @`context7.mdc` *(Assumed)*.
+    ```
+    // ❌ DON'T: Web search "how to use pandas read_csv" -> Use Context7 for pandas docs.
+    // ✅ DO: Use Context7 -> Get pandas docs -> THEN web search "pandas read_csv common errors stackoverflow" if needed.
+    ```
+  - **File Location:** Use `file_search`.
+  - **Directory Structure:** Use `list_dir`.
+
+- **Best Practices for Web Search:**
+  - **Formulate Precise Queries:** Include keywords, library names, versions, paper titles/authors, error messages.
+  - **Critically Evaluate Sources:** Prefer official docs, reputable forums/communities, published papers, and known expert blogs. Check dates for relevance.
+  - **Complement Other Tools:** Use web search to fill gaps left by internal search and official documentation.
+
+---
+description: Enforce project-local, intentional, and efficient use of the [[MCP tool memory]] for agent memory, with explicit tool selection and behavioral guidelines
+globs: agents/**/*, mcp/**/*, .cursor/mcp.json
+alwaysApply: true
+---
+- **Intentional Use of [[MCP tool memory]] Tools**
+  - **Create a new entity:**  
+    - Use [[create_entities]] from [[MCP tool memory]] only if the concept does not already exist in the graph.
+    - ✅ DO: Search with [[search_nodes]] before using [[create_entities]].
+    - ❌ DON'T: Create entities without checking for duplicates.
+  - **Add or update observations:**  
+    - Use [[add_observations]] from [[MCP tool memory]] to attach new facts to an existing entity.
+    - ✅ DO: Reference the entity by name and add only new information.
+    - ❌ DON'T: Overwrite or duplicate existing observations.
+  - **Create relations:**  
+    - Use [[create_relations]] from [[MCP tool memory]] to link entities when a new relationship is needed.
+    - ✅ DO: Check with [[search_nodes]] or [[read_graph]] to ensure the relation doesn’t already exist.
+  - **Query/reference the graph:**  
+    - Use [[search_nodes]] or [[read_graph]] from [[MCP tool memory]] before any write operation.
+    - ✅ DO: Always check the graph state before modifying it.
+
+- **Never bypass [[MCP tool memory]]**
+  - ❌ DON'T: Access `.cursor/memory.json` or Redis directly for any agent memory operation.
+
+- **Validation, Documentation, and Testing**
+  - Validate all data against schemas, document tool usage, and use MCP Inspector for testing [[MCP tool memory]] operations.
+
+- **Error Handling and Security**
+  - Handle errors gracefully and ensure sensitive data is protected in [[MCP tool memory]].
+
+- **References**
+  - [MCP Docs](https://github.com/modelcontextprotocol/docs)
+  - [MCP Inspector](https://github.com/modelcontextprotocol/inspector)

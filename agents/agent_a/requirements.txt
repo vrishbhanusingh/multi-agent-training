@@ -1,5 +1,5 @@
-pika
+pika>=1.2.0
 redis
 pytest
-transformers
-torch 
+google-generativeai>=0.7.0
+docker

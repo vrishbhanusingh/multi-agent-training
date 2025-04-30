@@ -1,0 +1,141 @@
+{"type":"entity","name":"test entity 1","entityType":"test","observations":["Testing MCP memory tool access after path update."]}
+{"type":"entity","name":"test entity 2","entityType":"test","observations":["Second test entity after path update."]}
+{"type":"entity","name":"Automated Testing for Agents","entityType":"Task","observations":["A robust automated testing framework has been added for all agents (agent_a, agent_b, agent_c) using pytest inside the Docker Compose environment. This ensures that each agent's ability to connect to RabbitMQ, declare queues, and send/receive messages is continuously verified.","Each agent has a tests/ directory with smoke and RabbitMQ integration tests. A root script (run_all_agent_tests.sh) runs all tests in sequence.","Smoke tests and RabbitMQ integration tests are implemented in test_smoke.py and test_rabbitmq.py for each agent.","The testing agent (agents/testing_agent/) can send test messages to all agents and verify agent-to-agent communication.","To run all agent tests: 1) docker compose up -d --build, 2) ./run_all_agent_tests.sh"]}
+{"type":"entity","name":"agent_a","entityType":"Agent","observations":["Python-based agent container. Connects to RabbitMQ and Redis. Declares and listens to its own queue. Has smoke and RabbitMQ integration tests.","Periodic message interval set to 120s.","Implements Message Callback with Response Rate Limiting (60s).","Uses Dedicated Pika Connections in sender thread.","State stored in Redis key 'agent:agent_a:state' as JSON string.","Message history stored in Redis key 'agent:agent_a:memory:message' as Sorted Set (zset) with timestamp scores."]}
+{"type":"entity","name":"agent_b","entityType":"Agent","observations":["Python-based agent container. Connects to RabbitMQ and Redis. Declares and listens to its own queue. Has smoke and RabbitMQ integration tests.","Periodic message interval set to 135s.","Implements Message Callback with Response Rate Limiting (60s).","Uses Dedicated Pika Connections in sender thread."]}
+{"type":"entity","name":"agent_c","entityType":"Agent","observations":["Python-based agent container. Connects to RabbitMQ and Redis. Declares and listens to its own queue. Has smoke and RabbitMQ integration tests.","Periodic message interval set to 150s.","Implements Message Callback with Response Rate Limiting (60s).","Uses Dedicated Pika Connections in sender thread."]}
+{"type":"entity","name":"testing_agent","entityType":"Agent","observations":["Dedicated agent for sending test messages to other agents. Used for verifying agent-to-agent communication."]}
+{"type":"entity","name":"MCP Server","entityType":"Service","observations":["FastAPI-based server. Manages agent registration, state, and messaging. Integrates with Redis and RabbitMQ."]}
+{"type":"entity","name":"RabbitMQ","entityType":"Service","observations":["Message broker for agent communication. Each agent has its own queue. Uses topic exchange for direct and broadcast messaging."]}
+{"type":"entity","name":"Redis","entityType":"Service","observations":["Key-value store for agent state and memory. Accessed via MCP server.","Confirmed via redis-cli that agent state and memory keys exist.","Agent state is stored as String (JSON).","Agent message history is stored as Sorted Set (zset)."]}
+{"type":"entity","name":"Docker Compose","entityType":"Orchestration","observations":["Orchestrates containers for agents, RabbitMQ, Redis, and MCP server."]}
+{"type":"entity","name":"pytest","entityType":"Testing Framework","observations":["Used for automated testing of agents. Each agent has smoke and integration tests."]}
+{"type":"entity","name":"run_all_agent_tests.sh","entityType":"Script","observations":["Shell script at project root. Runs all agent tests in sequence using Docker Compose."]}
+{"type":"entity","name":"test_smoke.py","entityType":"Test File","observations":["Basic smoke test for each agent to verify test setup."]}
+{"type":"entity","name":"test_rabbitmq.py","entityType":"Test File","observations":["Integration tests for RabbitMQ connection, queue declaration, binding, and message flow for each agent."]}
+{"type":"entity","name":"test_send.py","entityType":"Test File","observations":["Script in testing_agent that sends test messages to all agents via RabbitMQ."]}
+{"type":"entity","name":"server.py","entityType":"Code File","observations":["Implements FastAPI MCP server. Handles agent management, messaging, and state."]}
+{"type":"entity","name":"rabbitmq_client.py","entityType":"Code File","observations":["Handles RabbitMQ connections and messaging for MCP server."]}
+{"type":"entity","name":"redis_client.py","entityType":"Code File","observations":["Handles Redis connections for MCP server."]}
+{"type":"entity","name":"task 6 subtask 1","entityType":"subtask","observations":["Status: done. Subtask 'Add smoke tests for each agent' in task 6 has been completed as verified by codebase and Task Master CLI."]}
+{"type":"entity","name":"task 1","entityType":"task","observations":["Set up Docker Compose Infrastructure. Status: done."]}
+{"type":"entity","name":"task 2","entityType":"task","observations":["Implement MCP Server (FastAPI). Status: done."]}
+{"type":"entity","name":"task 3","entityType":"task","observations":["Create Agent Containers (A, B, C). Status: done."]}
+{"type":"entity","name":"task 4","entityType":"task","observations":["Implement Agent Messaging Logic. Status: done."]}
+{"type":"entity","name":"task 5","entityType":"task","observations":["Integrate Agent State and Memory with Redis. Status: pending."]}
+{"type":"entity","name":"task 6","entityType":"task","observations":["Automated Testing for Agents. Status: in-progress."]}
+{"type":"entity","name":"task 7","entityType":"task","observations":["Set Up Testing Agent for Communication Verification. Status: pending."]}
+{"type":"entity","name":"task 8","entityType":"task","observations":["Document Architecture and Usage. Status: pending."]}
+{"type":"entity","name":"task 9","entityType":"task","observations":["Enhance System with Advanced Features. Status: pending."]}
+{"type":"entity","name":"task 1 subtask 1","entityType":"subtask","observations":["Create docker-compose.yml. Status: done."]}
+{"type":"entity","name":"task 1 subtask 2","entityType":"subtask","observations":["Configure RabbitMQ and Redis services. Status: done."]}
+{"type":"entity","name":"task 1 subtask 3","entityType":"subtask","observations":["Add MCP server service. Status: done."]}
+{"type":"entity","name":"task 2 subtask 1","entityType":"subtask","observations":["Implement health and registration endpoints. Status: done."]}
+{"type":"entity","name":"task 2 subtask 2","entityType":"subtask","observations":["Integrate Redis for state/memory. Status: done."]}
+{"type":"entity","name":"task 2 subtask 3","entityType":"subtask","observations":["Integrate RabbitMQ for messaging. Status: done."]}
+{"type":"entity","name":"task 3 subtask 1","entityType":"subtask","observations":["Create agent_a container. Status: done."]}
+{"type":"entity","name":"task 3 subtask 2","entityType":"subtask","observations":["Create agent_b container. Status: done."]}
+{"type":"entity","name":"task 3 subtask 3","entityType":"subtask","observations":["Create agent_c container. Status: done."]}
+{"type":"entity","name":"task 4 subtask 1","entityType":"subtask","observations":["Direct messaging between agents. Status: done."]}
+{"type":"entity","name":"task 4 subtask 2","entityType":"subtask","observations":["Broadcast messaging to all agents. Status: done."]}
+{"type":"entity","name":"task 5 subtask 1","entityType":"subtask","observations":["Implement state storage in MCP and agents. Status: pending."]}
+{"type":"entity","name":"task 5 subtask 2","entityType":"subtask","observations":["Implement memory storage in MCP and agents. Status: pending."]}
+{"type":"entity","name":"task 6 subtask 2","entityType":"subtask","observations":["Add RabbitMQ integration tests. Status: pending."]}
+{"type":"entity","name":"task 6 subtask 3","entityType":"subtask","observations":["Create run_all_agent_tests.sh script. Status: pending."]}
+{"type":"entity","name":"task 6 subtask 4","entityType":"subtask","observations":["smoke-test. Status: pending."]}
+{"type":"entity","name":"task 7 subtask 1","entityType":"subtask","observations":["Create testing_agent container. Status: pending."]}
+{"type":"entity","name":"task 7 subtask 2","entityType":"subtask","observations":["Implement test_send.py script. Status: pending."]}
+{"type":"entity","name":"task 8 subtask 1","entityType":"subtask","observations":["Update README.md. Status: pending."]}
+{"type":"entity","name":"task 8 subtask 2","entityType":"subtask","observations":["Document agent setup and testing. Status: pending."]}
+{"type":"entity","name":"task 9 subtask 1","entityType":"subtask","observations":["Add authentication to MCP endpoints. Status: pending."]}
+{"type":"entity","name":"task 9 subtask 2","entityType":"subtask","observations":["Implement persistent logging. Status: pending."]}
+{"type":"entity","name":"task 9 subtask 3","entityType":"subtask","observations":["Add monitoring tools. Status: pending."]}
+{"type":"entity","entityType":"Service/API","observations":["Used by agents to generate messages and process responses."],"name":"Gemini LLM"}
+{"type":"entity","entityType":"Library","name":"Pika Library","observations":["Python client used by agents to interact with RabbitMQ."]}
+{"type":"entity","name":"Periodic Message Sending","entityType":"Feature/Process","observations":["Background thread in each agent (A, B, C) responsible for initiating messages at staggered intervals (120s, 135s, 150s respectively).","Initial implementation shared Pika connection with main thread, causing Pika Connection Errors.","Refactored to use Dedicated Pika Connections."]}
+{"type":"entity","name":"Message Callback","entityType":"Feature/Process","observations":["Function triggered in each agent upon receiving a message via RabbitMQ. Responsible for processing and potentially responding.","Identified as a source of frequent LLM calls due to processing responses.","Rate limiting was added to control LLM call frequency from responses.","Initial implementation had Sender Identification Error.","Uses JSON Message Format to receive sender info."]}
+{"type":"entity","observations":["Implemented in Message Callback to prevent responding to the same sender more than once per 60 seconds. Uses timestamps tracked per sender."],"entityType":"Feature/Mechanism","name":"Response Rate Limiting"}
+{"type":"entity","name":"JSON Message Format","entityType":"DataFormat","observations":["Adopted for RabbitMQ messages to include 'sender' and 'content' fields, fixing sender identification issues."]}
+{"type":"entity","observations":["Persistent StreamLostError, ChannelWrongStateError, AssertionError occurring in agents, especially in the Periodic Message Sending thread. Linked to threading issues with BlockingConnection."],"name":"Pika Connection Errors","entityType":"Issue/Bug"}
+{"type":"entity","entityType":"Issue/Bug","name":"Sender Identification Error","observations":["Agents were incorrectly logging/replying to themselves because `method.routing_key` was used instead of the actual sender identity. Fixed by using JSON Message Format."]}
+{"type":"entity","entityType":"Solution/Pattern","name":"Dedicated Pika Connections (Sender Thread)","observations":["Implemented in Periodic Message Sending thread. Each send operation now creates, uses, and closes its own connection/channel to mitigate threading errors."]}
+{"type":"relation","from":"test entity 1","to":"test entity 2","relationType":"test_relation"}
+{"type":"relation","from":"agent_a","to":"RabbitMQ","relationType":"connects_to"}
+{"type":"relation","from":"agent_a","to":"Redis","relationType":"connects_to"}
+{"type":"relation","from":"agent_b","to":"RabbitMQ","relationType":"connects_to"}
+{"type":"relation","from":"agent_b","to":"Redis","relationType":"connects_to"}
+{"type":"relation","from":"agent_c","to":"RabbitMQ","relationType":"connects_to"}
+{"type":"relation","from":"agent_c","to":"Redis","relationType":"connects_to"}
+{"type":"relation","from":"testing_agent","to":"RabbitMQ","relationType":"connects_to"}
+{"type":"relation","from":"testing_agent","to":"agent_a","relationType":"sends_test_message_to"}
+{"type":"relation","from":"testing_agent","to":"agent_b","relationType":"sends_test_message_to"}
+{"type":"relation","from":"testing_agent","to":"agent_c","relationType":"sends_test_message_to"}
+{"type":"relation","from":"MCP Server","to":"RabbitMQ","relationType":"integrates_with"}
+{"type":"relation","from":"MCP Server","to":"Redis","relationType":"integrates_with"}
+{"type":"relation","from":"MCP Server","to":"agent_a","relationType":"manages"}
+{"type":"relation","from":"MCP Server","to":"agent_b","relationType":"manages"}
+{"type":"relation","from":"MCP Server","to":"agent_c","relationType":"manages"}
+{"type":"relation","from":"Docker Compose","to":"agent_a","relationType":"orchestrates"}
+{"type":"relation","from":"Docker Compose","to":"agent_b","relationType":"orchestrates"}
+{"type":"relation","from":"Docker Compose","to":"agent_c","relationType":"orchestrates"}
+{"type":"relation","from":"Docker Compose","to":"testing_agent","relationType":"orchestrates"}
+{"type":"relation","from":"Docker Compose","to":"RabbitMQ","relationType":"orchestrates"}
+{"type":"relation","from":"Docker Compose","to":"Redis","relationType":"orchestrates"}
+{"type":"relation","from":"Docker Compose","to":"MCP Server","relationType":"orchestrates"}
+{"type":"relation","from":"pytest","to":"agent_a","relationType":"tests"}
+{"type":"relation","from":"pytest","to":"agent_b","relationType":"tests"}
+{"type":"relation","from":"pytest","to":"agent_c","relationType":"tests"}
+{"type":"relation","from":"run_all_agent_tests.sh","to":"pytest","relationType":"invokes"}
+{"type":"relation","from":"run_all_agent_tests.sh","to":"agent_a","relationType":"runs_tests_for"}
+{"type":"relation","from":"run_all_agent_tests.sh","to":"agent_b","relationType":"runs_tests_for"}
+{"type":"relation","from":"run_all_agent_tests.sh","to":"agent_c","relationType":"runs_tests_for"}
+{"type":"relation","from":"test_smoke.py","to":"agent_a","relationType":"tests"}
+{"type":"relation","from":"test_smoke.py","to":"agent_b","relationType":"tests"}
+{"type":"relation","from":"test_smoke.py","to":"agent_c","relationType":"tests"}
+{"type":"relation","from":"test_rabbitmq.py","to":"agent_a","relationType":"tests"}
+{"type":"relation","from":"test_rabbitmq.py","to":"agent_b","relationType":"tests"}
+{"type":"relation","from":"test_rabbitmq.py","to":"agent_c","relationType":"tests"}
+{"type":"relation","from":"test_send.py","to":"testing_agent","relationType":"belongs_to"}
+{"type":"relation","from":"server.py","to":"MCP Server","relationType":"implements"}
+{"type":"relation","from":"rabbitmq_client.py","to":"MCP Server","relationType":"used_by"}
+{"type":"relation","from":"redis_client.py","to":"MCP Server","relationType":"used_by"}
+{"type":"relation","from":"task 1","to":"task 1 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 1","to":"task 1 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 1","to":"task 1 subtask 3","relationType":"has_subtask"}
+{"type":"relation","from":"task 2","to":"task 2 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 2","to":"task 2 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 2","to":"task 2 subtask 3","relationType":"has_subtask"}
+{"type":"relation","from":"task 3","to":"task 3 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 3","to":"task 3 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 3","to":"task 3 subtask 3","relationType":"has_subtask"}
+{"type":"relation","from":"task 4","to":"task 4 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 4","to":"task 4 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 5","to":"task 5 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 5","to":"task 5 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 6","to":"task 6 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 6","to":"task 6 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 6","to":"task 6 subtask 3","relationType":"has_subtask"}
+{"type":"relation","from":"task 6","to":"task 6 subtask 4","relationType":"has_subtask"}
+{"type":"relation","from":"task 7","to":"task 7 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 7","to":"task 7 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 8","to":"task 8 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 8","to":"task 8 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 9","to":"task 9 subtask 1","relationType":"has_subtask"}
+{"type":"relation","from":"task 9","to":"task 9 subtask 2","relationType":"has_subtask"}
+{"type":"relation","from":"task 9","to":"task 9 subtask 3","relationType":"has_subtask"}
+{"type":"relation","to":"Periodic Message Sending","from":"agent_a","relationType":"implements"}
+{"type":"relation","from":"agent_a","relationType":"implements","to":"Message Callback"}
+{"type":"relation","from":"agent_b","to":"Periodic Message Sending","relationType":"implements"}
+{"type":"relation","to":"Message Callback","relationType":"implements","from":"agent_b"}
+{"type":"relation","relationType":"implements","to":"Periodic Message Sending","from":"agent_c"}
+{"type":"relation","from":"agent_c","to":"Message Callback","relationType":"implements"}
+{"type":"relation","from":"Message Callback","to":"Gemini LLM","relationType":"uses"}
+{"type":"relation","relationType":"implements","from":"Message Callback","to":"Response Rate Limiting"}
+{"type":"relation","to":"JSON Message Format","relationType":"uses","from":"Message Callback"}
+{"type":"relation","relationType":"had_issue","from":"Message Callback","to":"Sender Identification Error"}
+{"type":"relation","relationType":"uses","from":"Periodic Message Sending","to":"Gemini LLM"}
+{"type":"relation","to":"Pika Library","from":"Periodic Message Sending","relationType":"uses"}
+{"type":"relation","relationType":"had_issue","to":"Pika Connection Errors","from":"Periodic Message Sending"}
+{"type":"relation","relationType":"uses","to":"Dedicated Pika Connections (Sender Thread)","from":"Periodic Message Sending"}
+{"type":"relation","from":"JSON Message Format","relationType":"fixes","to":"Sender Identification Error"}
+{"type":"relation","relationType":"fixes","from":"Dedicated Pika Connections (Sender Thread)","to":"Pika Connection Errors"}

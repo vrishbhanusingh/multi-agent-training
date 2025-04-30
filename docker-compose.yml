@@ -5,7 +5,7 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"   # AMQP protocol port
+      - "5672:5672" # AMQP protocol port
       - "15672:15672" # Management UI port
     environment:
       - RABBITMQ_DEFAULT_USER=admin
@@ -13,7 +13,7 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -27,7 +27,7 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -69,6 +69,8 @@ services:
       - RABBITMQ_PASSWORD=admin
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
 
   agent_b:
     build:
@@ -87,6 +89,8 @@ services:
       - RABBITMQ_PASSWORD=admin
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
 
   agent_c:
     build:
@@ -105,6 +109,8 @@ services:
       - RABBITMQ_PASSWORD=admin
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
 
   testing_agent:
     build:
@@ -128,4 +134,4 @@ services:
 
 volumes:
   rabbitmq_data:
-  redis_data: 
+  redis_data:

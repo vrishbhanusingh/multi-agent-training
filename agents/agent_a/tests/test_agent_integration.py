@@ -1,40 +1,36 @@
-import subprocess
-import sys
-import time
 import os
+import time
+import pika
+import docker
 
-import pytest
-
-def test_launch_agent_b_and_wait_ready():
-    agent_b_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../agent_b/agent.py'))
-    
-    # Start agent_b as a subprocess
-    proc = subprocess.Popen(
-        [sys.executable, agent_b_path],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
-        env=os.environ.copy(),
+def test_agent_b_receives_message():
+    """
+    Integration test: Send a test message to agent_b via RabbitMQ and check agent_b's logs for receipt.
+    Assumes agent_b is already running as a container (via Docker Compose).
+    """
+    # Send a test message to agent_b
+    rabbitmq_host = os.environ.get("RABBITMQ_HOST", "rabbitmq")
+    rabbitmq_port = int(os.environ.get("RABBITMQ_PORT", 5672))
+    rabbitmq_user = os.environ.get("RABBITMQ_USER", "admin")
+    rabbitmq_password = os.environ.get("RABBITMQ_PASSWORD", "admin")
+    credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
+    parameters = pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials)
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
+    channel.exchange_declare(exchange='agent_communication', exchange_type='topic', durable=True)
+    test_message = "pytest-integration-message"
+    channel.basic_publish(
+        exchange='agent_communication',
+        routing_key='agent_b',
+        body=test_message.encode()
     )
+    connection.close()
 
-    try:
-        # Wait for 'Waiting for messages...' in output (max 10 seconds)
-        ready = False
-        start = time.time()
-        while time.time() - start < 10:
-            line = proc.stdout.readline()
-            if not line:
-                time.sleep(0.1)
-                continue
-            print(f"[agent_b output] {line.strip()}")
-            if "Waiting for messages..." in line:
-                ready = True
-                break
-        assert ready, "agent_b did not become ready in time"
-    finally:
-        proc.terminate()
-        try:
-            proc.wait(timeout=2)
-        except subprocess.TimeoutExpired:
-            proc.kill() 
+    # Wait briefly for agent_b to process the message
+    time.sleep(2)
+
+    # Use docker SDK to get agent_b logs
+    client = docker.from_env()
+    container = client.containers.get("agent_b")
+    logs = container.logs(tail=100).decode()
+    assert test_message in logs, f"agent_b did not receive the test message. Logs:\n{logs}"

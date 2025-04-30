@@ -23,7 +23,8 @@ class RabbitMQClient:
             # Declare exchanges
             self.channel.exchange_declare(
                 exchange='agent_communication',
-                exchange_type='topic'
+                exchange_type='topic',
+                durable=True  # Ensure the exchange is declared as durable
             )
             
             # Declare default queues
@@ -81,4 +82,4 @@ class RabbitMQClient:
     def close(self):
         """Close the connection"""
         if self.connection and not self.connection.is_closed:
-            self.connection.close() 
+            self.connection.close()
