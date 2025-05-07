@@ -1,5 +1,13 @@
+## Cleaned requirements.txt for agent_a
+# pika: RabbitMQ client
 pika>=1.2.0
+# redis: Redis client
 redis
+# pytest: Testing framework
 pytest
+# google-generativeai: Gemini LLM integration
 google-generativeai>=0.7.0
+# docker: For Docker-related utilities (if needed)
 docker
+# protobuf: Protocol Buffers for A2A messaging
+protobuf

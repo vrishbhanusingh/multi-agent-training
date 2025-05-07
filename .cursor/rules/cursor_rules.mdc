@@ -63,9 +63,9 @@ alwaysApply: true
     - Use Chain of Draft (CoD) style for short, dense reasoning when possible.
   - Use full, detailed thinking using the MCP tool sequential-thinking only for complex, ambiguous, or critical queries.
     - Example: Multi-step planning, debugging, or when explicitly requested.
-  - **For all responses Use MCP tool sequential-thinking** in either concise mode or full mode.
+  - **For all responses Use MCP tool sequential-thinking** in either concise way or full detailed thinkning.
 
-- **When to Use Each Mode**
+- **When to Use Each way**
   - **Concise/Constrained:** Most coding, lookup, or simple implementation tasks(use 1-2 reasoning steps using the mcp tool sequential-thinking).
   - **Full Sequential:** Complex design, architecture, or when interpretability is critical(Use full, detailed thinking using the MCP tool sequential-thinking).
 
@@ -163,12 +163,16 @@ alwaysApply: true
   - **Formulate Precise Queries:** Include keywords, library names, versions, paper titles/authors, error messages.
   - **Critically Evaluate Sources:** Prefer official docs, reputable forums/communities, published papers, and known expert blogs. Check dates for relevance.
   - **Complement Other Tools:** Use web search to fill gaps left by internal search and official documentation.
+  - **Gather information in steps:** Use web search in steps. figure out out what you want to search for, refine the query for web search, get the results, think about the results and if you need more information then make another web search and so on. 
 
 ---
 description: Enforce project-local, intentional, and efficient use of the [[MCP tool memory]] for agent memory, with explicit tool selection and behavioral guidelines
 globs: agents/**/*, mcp/**/*, .cursor/mcp.json
 alwaysApply: true
 ---
+- **FOR EVERY QUERY**
+  -Use the MCP tool memory to understand the context of the query and to gather information. 
+  -Use the MCP tool memory Once you are done responding to logAny important details (e.g., the thinking behind your actions, the code that you ran, the code that you edited, etc.) 
 - **Intentional Use of [[MCP tool memory]] Tools**
   - **Create a new entity:**  
     - Use [[create_entities]] from [[MCP tool memory]] only if the concept does not already exist in the graph.
@@ -195,5 +199,5 @@ alwaysApply: true
   - Handle errors gracefully and ensure sensitive data is protected in [[MCP tool memory]].
 
 - **References**
-  - [MCP Docs](https://github.com/modelcontextprotocol/docs)
-  - [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
+  - [MCP Docs](mdc:https:/github.com/modelcontextprotocol/docs)
+  - [MCP Inspector](mdc:https:/github.com/modelcontextprotocol/inspector)

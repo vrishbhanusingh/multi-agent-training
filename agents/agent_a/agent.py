@@ -6,8 +6,8 @@ import time
 import threading
 import random   
 import datetime
-# Import JSON library for encoding/decoding message payloads.
-import json
+# Import Protocol Buffers generated code for A2A messaging.
+from common.a2a_protocol.proto import a2a_message_pb2
 # Import custom functions for interacting with the Gemini LLM and processing messages.
 from gemini_llm import process_message, ask_gemini  
 # Import custom clients for interacting with Redis for agent state and memory.
@@ -124,21 +124,24 @@ def send_gemini_message_periodically(interval=120):
             print(f"[{AGENT_NAME} Sender Thread] Connected.") 
             # --- End connection setup ---
 
-            # --- Publish Message ---
-            # Create the JSON payload containing the sender's name and the message content.
-            payload = json.dumps({"sender": AGENT_NAME, "content": message})
+            # --- Publish Protobuf Message ---
+            # Construct the A2AMessage protobuf object (see a2a_message.proto for field definitions).
+            message_obj = a2a_message_pb2.A2AMessage(
+                sender=AGENT_NAME,
+                recipient=target_agent,
+                content=message,
+                sent_at=current_time_iso
+            )
+            # Serialize the protobuf message to bytes for transmission.
+            payload_bytes = message_obj.SerializeToString()
 
-            # Log the publishing attempt.
-            print(f"[{AGENT_NAME} Sender Thread] Publishing to {target_agent}...") 
-            # Publish the message to the specified exchange with the target agent's name as the routing key.
-            # The body is the UTF-8 encoded JSON payload.
+            print(f"[{AGENT_NAME} Sender Thread] Publishing protobuf message to {target_agent}...")
             sender_channel.basic_publish(
                 exchange='agent_communication',
                 routing_key=target_agent,
-                body=payload.encode()
+                body=payload_bytes
             )
-            # Log successful publishing (note: message content logged here might be slightly different from payload if needed).
-            print(f"[{AGENT_NAME}] Sent to {target_agent}: {message}")
+            print(f"[{AGENT_NAME}] Sent protobuf message to {target_agent}: {message_obj.content}")
 
         except pika.exceptions.AMQPConnectionError as conn_err:
             print(f"[{AGENT_NAME} Sender Thread] Connection failed: {conn_err}. Will retry after sleep.")
@@ -209,24 +212,18 @@ while True:
             # Update environment variable (mainly for consistency).
             os.environ["TIMESTAMP"] = current_time_iso
 
-            # --- Decode Incoming Message ---
-            # Attempt to decode the message body as JSON and extract sender/content.
+            # --- Decode Incoming Protobuf Message ---
             try:
-                # Decode the byte string to UTF-8, then parse the JSON.
-                data = json.loads(body.decode())
-                # Extract the original sender's name from the JSON payload.
-                actual_sender = data['sender']
-                # Extract the message content from the JSON payload.
-                received_message = data['content']
-            # Handle potential errors if the message isn't valid JSON or lacks expected keys.
-            except (json.JSONDecodeError, KeyError) as e:
-                print(f"[{AGENT_NAME}] Error decoding message body: {e}. Body: {body[:100]}...")
-                # NOTE: If auto_ack is False, you MUST acknowledge (ack or nack) the message here.
-                # Since auto_ack=True is used later, we just return to ignore the malformed message.
+                # Parse the incoming bytes as an A2AMessage protobuf object.
+                msg = a2a_message_pb2.A2AMessage()
+                msg.ParseFromString(body)
+                actual_sender = msg.sender
+                received_message = msg.content
+            except Exception as e:
+                print(f"[{AGENT_NAME}] Error decoding protobuf message: {e}. Raw body: {body[:100]}...")
                 return
 
-            # Log the received message using the correctly identified sender.
-            print(f"[{AGENT_NAME}] Received from {actual_sender}: {received_message}") 
+            print(f"[{AGENT_NAME}] Received protobuf message from {actual_sender}: {received_message}")
 
             # --- Rate Limiting Check ---
             # Get the timestamp when we last responded to this specific 'actual_sender'.
@@ -279,17 +276,21 @@ while True:
             
             # --- Send Response ---
             # Check if the sender wasn't a broadcast message and if a response was generated.
-            if actual_sender != "broadcast" and response_part: 
-                # Create the JSON payload for the response message.
-                response_payload = json.dumps({"sender": AGENT_NAME, "content": response_part})
-                # Publish the response back to the original sender using their name as the routing key.
+            if actual_sender != "broadcast" and response_part:
+                # Construct a protobuf response message.
+                response_msg = a2a_message_pb2.A2AMessage(
+                    sender=AGENT_NAME,
+                    recipient=actual_sender,
+                    content=response_part,
+                    sent_at=current_time_iso
+                )
+                # Serialize and send the response as protobuf bytes.
                 channel.basic_publish(
                     exchange='agent_communication',
-                    routing_key=actual_sender,   # Route reply to the correct sender.
-                    body=response_payload.encode() # Send JSON payload.
+                    routing_key=actual_sender,
+                    body=response_msg.SerializeToString()
                 )
-                # Log the response being sent.
-                print(f"[{AGENT_NAME}] Responded to {actual_sender}: {response_part}") 
+                print(f"[{AGENT_NAME}] Responded to {actual_sender} with protobuf: {response_part}")
 
                 # --- Update Rate Limiting Info ---
                 # Record the timestamp of this response TO the specific actual_sender.

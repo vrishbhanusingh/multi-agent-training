@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+// a2a_message.proto
+// This file defines the structure of an Agent-to-Agent (A2A) message using Protocol Buffers (protobuf).
+// Protocol Buffers are a language-neutral, platform-neutral way of serializing structured data.
+// This .proto file will be used to generate Python classes for message serialization/deserialization.
+
+// The package name helps organize generated code and avoid naming conflicts.
+package a2a;
+
+// AgentMessage defines the structure of a message sent between agents in the system.
+message AgentMessage {
+  // The name or ID of the agent sending the message.
+  string sender = 1;
+
+  // The name or ID of the agent intended to receive the message.
+  string recipient = 2;
+
+  // The main content of the message (e.g., text, command, etc.).
+  string content = 3;
+
+  // The time the message was sent, as an ISO 8601 string (e.g., "2025-05-01T12:00:00Z").
+  string sent_at = 4;
+}
+
+// Each field has a unique number (1, 2, 3, 4). These numbers are used in the binary encoding.
+// The field type (string) specifies the kind of data stored.
+// Comments above each field explain its purpose.

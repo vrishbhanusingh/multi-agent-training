@@ -27,3 +27,10 @@ node_modules/
 # Task files
 tasks.json
 tasks/ 
+# pixi environments
+.pixi
+*.egg-info
+
+**/.claude/settings.local.json
+
+venv/

@@ -54,8 +54,8 @@ services:
 
   agent_a:
     build:
-      context: ./agents/agent_a
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: agents/agent_a/Dockerfile
     container_name: agent_a
     depends_on:
       rabbitmq:
