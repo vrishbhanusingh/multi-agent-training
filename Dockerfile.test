@@ -1,0 +1,24 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy project structure
+COPY . .
+
+# Install dependencies and pytest
+RUN pip install --no-cache-dir -r agents/executor_agent/requirements.txt \
+    && pip install --no-cache-dir -r agents/orchestrator_agent/requirements.txt \
+    && pip install pytest pytest-asyncio pytest-cov aiohttp ipdb coverage
+
+# Environment variables
+ENV PYTHONPATH=/app
+ENV LOG_LEVEL=INFO
+
+# Command to run the tests
+CMD ["python", "-m", "pytest", "agents/executor_agent/tests/unit", "-v"]

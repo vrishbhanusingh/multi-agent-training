@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: orchestrator_test
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d orchestrator_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: ./agents/orchestrator_agent/Dockerfile
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: orchestrator_test
+      DATABASE_URL: postgresql://testuser:testpassword@postgres:5432/orchestrator_test
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      JWT_SECRET_KEY: test_secret_key
+      API_PORT: 8000
+      LOG_LEVEL: INFO
+      AUTH_USERNAME: executor
+      AUTH_PASSWORD: executor_password
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./agents/orchestrator_agent:/app/agents/orchestrator_agent
+      - ./common:/app/common
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  executor:
+    build:
+      context: .
+      dockerfile: ./agents/executor_agent/Dockerfile
+    environment:
+      ORCHESTRATOR_API_URL: http://orchestrator:8000
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_ENABLED: "true"
+      AUTH_ENABLED: "true"
+      AUTH_USERNAME: executor
+      AUTH_PASSWORD: executor_password
+      CAPABILITIES: text_processing,time_management,data_transformation
+      LOG_LEVEL: INFO
+    depends_on:
+      - orchestrator
+      
+  # Unit Test service
+  unit-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      PYTHONPATH: /app
+      LOG_LEVEL: INFO
+    command: python -m pytest agents/executor_agent/tests/unit -v
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  # Integration Test service
+  integration-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      PYTHONPATH: /app
+      LOG_LEVEL: INFO
+      ORCHESTRATOR_API_URL: http://orchestrator:8000
+      AUTH_USERNAME: executor
+      AUTH_PASSWORD: executor_password
+    command: python -m pytest agents/executor_agent/tests/integration -v
+    volumes:
+      - .:/app
+    depends_on:
+      - orchestrator
+      - executor
+      - postgres
+      - rabbitmq
+
+  # End-to-End Test service
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      PYTHONPATH: /app
+      LOG_LEVEL: INFO
+      ORCHESTRATOR_API_URL: http://orchestrator:8000
+      AUTH_USERNAME: executor
+      AUTH_PASSWORD: executor_password
+    command: python agents/executor_agent/tests/e2e_test.py --orchestrator-url http://orchestrator:8000 --username executor --password executor_password
+    volumes:
+      - .:/app
+    depends_on:
+      - orchestrator
+      - executor
+
+volumes:
+  postgres_test_data:
