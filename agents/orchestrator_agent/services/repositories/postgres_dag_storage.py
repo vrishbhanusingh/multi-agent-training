@@ -75,6 +75,17 @@ class TaskDependencyModel(Base):
 
 
 class PostgresDAGStorage(DAGStorageInterface):
+
+    def health_check(self) -> bool:
+        """Check the health of the PostgreSQL connection."""
+        try:
+            with self.session_scope() as session:
+                # Simple query to check DB connection
+                session.execute("SELECT 1")
+            return True
+        except Exception as e:
+            logger.error(f"PostgresDAGStorage health check failed: {e}")
+            return False
     """PostgreSQL implementation of the DAG storage interface."""
     
     def __init__(self, connection_string: Optional[str] = None):

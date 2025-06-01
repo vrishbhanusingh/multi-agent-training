@@ -203,7 +203,7 @@ class Query:
         id: UUID = None,
         content: str = "",
         user_id: Optional[str] = None,
-        metadata: Dict[str, Any] = None,
+        meta: Dict[str, Any] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
         status: str = "pending",
@@ -213,7 +213,7 @@ class Query:
         self.id = id if id else uuid4()
         self.content = content
         self.user_id = user_id
-        self.metadata = metadata or {}
+        self.meta = meta or {}
         self.created_at = created_at or datetime.now()
         self.updated_at = updated_at or datetime.now()
         self.status = status
@@ -225,7 +225,7 @@ class Query:
             "id": str(self.id),
             "content": self.content,
             "user_id": self.user_id,
-            "metadata": self.metadata,
+            "meta": self.meta,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "status": self.status,

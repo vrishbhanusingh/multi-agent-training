@@ -179,9 +179,9 @@ class AdaptiveDagPlanner(DAGPlannerInterface):
             
             params["transform_types"] = transform_types or None
         
-        # Add metadata from the query
-        if query.metadata:
-            params["metadata"] = query.metadata
+        # Add meta from the query
+        if hasattr(query, "meta") and query.meta:
+            params["meta"] = query.meta
         
         return params
     

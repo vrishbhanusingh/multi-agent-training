@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies first for better caching
-COPY requirements.txt .
+COPY agents/orchestrator_agent/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the common libraries and orchestrator code

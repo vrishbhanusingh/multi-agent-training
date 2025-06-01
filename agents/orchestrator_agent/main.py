@@ -128,13 +128,11 @@ class OrchestratorAgent:
         logger.info("Starting Orchestrator Agent")
 
         try:
-            # Step 1: Initialize database schema (idempotent)
-            logger.info("Initializing database schema")
-            self.dag_storage.initialize_schema()
+            # Step 1: Database schema is initialized by PostgresDAGStorage if needed
+            logger.info("Database schema initialization handled by PostgresDAGStorage")
 
-            # Step 2: Initialize RabbitMQ connections and exchanges
-            logger.info("Initializing RabbitMQ")
-            self.rabbitmq_client.initialize()
+            # Step 2: RabbitMQ connection is initialized in RabbitMQClient.__init__
+            logger.info("RabbitMQ client already initialized in constructor")
 
             # Step 3: Start background maintenance workers
             self.start_background_workers()

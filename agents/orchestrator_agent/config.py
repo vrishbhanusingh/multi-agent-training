@@ -28,9 +28,10 @@ logger = logging.getLogger(__name__)
 
 class Config:
     """Configuration for the orchestrator agent."""
-    
     def __init__(self):
-        """Initialize with default values and environment variables."""
+        # Background worker intervals (in seconds)
+        self.task_reassignment_interval = int(os.getenv("TASK_REASSIGNMENT_INTERVAL", "30"))
+        self.health_check_interval = int(os.getenv("HEALTH_CHECK_INTERVAL", "30"))
         # Database configuration
         self.postgres_host = os.getenv("POSTGRES_HOST", "postgres")
         self.postgres_port = int(os.getenv("POSTGRES_PORT", "5432"))
@@ -40,7 +41,6 @@ class Config:
         self.postgres_pool_size = int(os.getenv("POSTGRES_POOL_SIZE", "10"))
         self.postgres_max_overflow = int(os.getenv("POSTGRES_MAX_OVERFLOW", "20"))
         self.postgres_pool_timeout = int(os.getenv("POSTGRES_POOL_TIMEOUT", "30"))
-        
         # RabbitMQ configuration
         self.rabbitmq_host = os.getenv("RABBITMQ_HOST", "rabbitmq")
         self.rabbitmq_port = int(os.getenv("RABBITMQ_PORT", "5672"))
@@ -51,32 +51,28 @@ class Config:
         self.rabbitmq_queue_prefix = os.getenv("RABBITMQ_QUEUE_PREFIX", "tasks")
         self.rabbitmq_connection_attempts = int(os.getenv("RABBITMQ_CONNECTION_ATTEMPTS", "5"))
         self.rabbitmq_retry_delay = int(os.getenv("RABBITMQ_RETRY_DELAY", "5"))
-        
         # API configuration
         self.api_host = os.getenv("API_HOST", "0.0.0.0")
         self.api_port = int(os.getenv("API_PORT", "8000"))
         self.api_debug = os.getenv("API_DEBUG", "False").lower() == "true"
         self.api_workers = int(os.getenv("API_WORKERS", "4"))
         self.api_timeout = int(os.getenv("API_TIMEOUT", "60"))
-        
         # JWT configuration
         self.jwt_secret_key = os.getenv("JWT_SECRET_KEY", "super-secret-key-change-in-production")
         self.jwt_algorithm = os.getenv("JWT_ALGORITHM", "HS256")
         self.jwt_expiration_minutes = int(os.getenv("JWT_EXPIRATION_MINUTES", "30"))
-        
         # Logging configuration
         self.log_level = os.getenv("LOG_LEVEL", "INFO")
         self.log_format = os.getenv(
             "LOG_FORMAT", 
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
-        
         # Set log level
         logging.basicConfig(
             level=getattr(logging, self.log_level),
             format=self.log_format
         )
-    
+
     @property
     def postgres_connection_string(self) -> str:
         """Get the PostgreSQL connection string."""
@@ -84,7 +80,7 @@ class Config:
             f"postgresql://{self.postgres_user}:{self.postgres_password}@"
             f"{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert configuration to a dictionary."""
         return {
@@ -118,11 +114,10 @@ class Config:
                 "level": self.log_level,
             }
         }
-    
+
     def log_config(self) -> None:
         """Log the configuration (with sensitive information masked)."""
         config_dict = self.to_dict()
-        
         # Mask sensitive information
         if "postgres" in config_dict and "password" in config_dict["postgres"]:
             config_dict["postgres"]["password"] = "********"
@@ -130,9 +125,7 @@ class Config:
             config_dict["rabbitmq"]["password"] = "********"
         if hasattr(self, "jwt_secret_key"):
             config_dict["jwt"] = {"secret_key": "********"}
-        
         logger.info(f"Configuration: {config_dict}")
-
 
 # Create a singleton instance
 config = Config()

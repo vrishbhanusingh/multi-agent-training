@@ -101,12 +101,12 @@ class TestDomainModels(unittest.TestCase):
     
     def test_query_creation(self):
         """Test query creation and properties."""
-        query = Query(content="Test query", user_id="user123", metadata={"key": "value"})
+        query = Query(content="Test query", user_id="user123", meta={"key": "value"})
         
         self.assertIsNotNone(query.id)
         self.assertEqual(query.content, "Test query")
         self.assertEqual(query.user_id, "user123")
-        self.assertEqual(query.metadata, {"key": "value"})
+        self.assertEqual(query.meta, {"key": "value"})
         self.assertEqual(query.status, "pending")
         self.assertIsNone(query.dag_id)
 

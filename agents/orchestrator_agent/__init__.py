@@ -6,10 +6,11 @@ import logging
 import os
 from typing import Dict, Optional
 
+
 from agents.orchestrator_agent.controllers.api import app
 from agents.orchestrator_agent.domain.interfaces import QueryServiceInterface, DAGPlannerInterface, DAGStorageInterface, TaskDispatcherInterface
 from agents.orchestrator_agent.services.query_service import QueryService
-from agents.orchestrator_agent.services.dag_planner import SimpleDagPlanner
+from agents.orchestrator_agent.services.dag_planner import AdaptiveDagPlanner
 from agents.orchestrator_agent.repositories.postgres_dag_storage import PostgresDAGStorage
 from agents.orchestrator_agent.services.task_dispatcher import TaskDispatcher
 
@@ -40,12 +41,10 @@ class ServiceContainer:
         try:
             # Initialize repositories
             self.dag_storage: DAGStorageInterface = PostgresDAGStorage(postgres_url)
-            
             # Initialize services
-            self.query_service: QueryServiceInterface = QueryService()
-            self.dag_planner: DAGPlannerInterface = SimpleDagPlanner()
+            self.dag_planner: DAGPlannerInterface = AdaptiveDagPlanner()
+            self.query_service: QueryServiceInterface = QueryService(dag_storage=self.dag_storage, dag_planner=self.dag_planner)
             self.task_dispatcher: TaskDispatcherInterface = TaskDispatcher(self.dag_storage)
-            
             logger.info("Services initialized successfully")
         except Exception as e:
             logger.error(f"Error initializing services: {e}")
@@ -74,4 +73,3 @@ def get_task_dispatcher() -> TaskDispatcherInterface:
 
 # Export the FastAPI app for uvicorn
 # When running with uvicorn, we use: uvicorn agents.orchestrator_agent:app
-app = app

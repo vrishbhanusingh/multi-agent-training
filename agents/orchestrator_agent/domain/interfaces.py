@@ -12,7 +12,7 @@ class QueryServiceInterface(ABC):
     """Interface for query-related operations."""
     
     @abstractmethod
-    def create_query(self, content: str, user_id: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> Query:
+    def create_query(self, content: str, user_id: Optional[str] = None, meta: Optional[Dict[str, Any]] = None) -> Query:
         """Create a new query from user input."""
         pass
     

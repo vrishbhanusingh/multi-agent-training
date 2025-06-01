@@ -41,7 +41,7 @@ class QueryModel(Base):
     id = Column(PostgresUUID(as_uuid=True), primary_key=True)
     content = Column(Text, nullable=False)
     user_id = Column(String, nullable=True)
-    metadata = Column(JSONB, nullable=True)
+    meta = Column('meta', JSONB, nullable=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
     status = Column(String, nullable=False)
@@ -59,12 +59,12 @@ class QueryService(QueryServiceInterface):
         # We'll reuse the session management from DAGStorage
         # In a real implementation, we might have a separate session factory
     
-    def create_query(self, content: str, user_id: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> Query:
+    def create_query(self, content: str, user_id: Optional[str] = None, meta: Optional[Dict[str, Any]] = None) -> Query:
         """Create a new query from user input."""
         logger.info(f"Creating query with user_id: {user_id}")
         
         # Create the query domain object
-        query = Query(content=content, user_id=user_id, metadata=metadata)
+        query = Query(content=content, user_id=user_id, meta=meta)
         
         if self.dag_storage:
             try:
@@ -74,7 +74,7 @@ class QueryService(QueryServiceInterface):
                         id=query.id,
                         content=query.content,
                         user_id=query.user_id,
-                        metadata=query.metadata,
+                        meta=query.meta,
                         created_at=query.created_at,
                         updated_at=query.updated_at,
                         status=query.status,
@@ -131,7 +131,7 @@ class QueryService(QueryServiceInterface):
                     id=query_model.id,
                     content=query_model.content,
                     user_id=query_model.user_id,
-                    metadata=query_model.metadata,
+                    meta=query_model.meta,
                     created_at=query_model.created_at,
                     updated_at=query_model.updated_at,
                     status=query_model.status,
@@ -169,7 +169,7 @@ class QueryService(QueryServiceInterface):
                         id=qm.id,
                         content=qm.content,
                         user_id=qm.user_id,
-                        metadata=qm.metadata,
+                        meta=qm.meta,
                         created_at=qm.created_at,
                         updated_at=qm.updated_at,
                         status=qm.status,
