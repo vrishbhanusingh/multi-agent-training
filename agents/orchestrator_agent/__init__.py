@@ -11,7 +11,7 @@ from agents.orchestrator_agent.controllers.api import app
 from agents.orchestrator_agent.domain.interfaces import QueryServiceInterface, DAGPlannerInterface, DAGStorageInterface, TaskDispatcherInterface
 from agents.orchestrator_agent.services.query_service import QueryService
 from agents.orchestrator_agent.services.dag_planner import AdaptiveDagPlanner
-from agents.orchestrator_agent.repositories.postgres_dag_storage import PostgresDAGStorage
+from agents.orchestrator_agent.services.repositories.postgres_dag_storage import PostgresDAGStorage
 from agents.orchestrator_agent.services.task_dispatcher import TaskDispatcher
 
 # Initialize logging

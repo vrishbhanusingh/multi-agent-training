@@ -38,7 +38,7 @@ from agents.orchestrator_agent.domain.interfaces import (
 from agents.orchestrator_agent.domain.models import TaskStatus, Query, DAG, Task
 from agents.orchestrator_agent.services.query_service import QueryService
 from agents.orchestrator_agent.services.dag_planner import AdaptiveDagPlanner
-from agents.orchestrator_agent.repositories.postgres_dag_storage import PostgresDAGStorage
+from agents.orchestrator_agent.services.repositories.postgres_dag_storage import PostgresDAGStorage
 from agents.orchestrator_agent.services.task_dispatcher import TaskDispatcher
 from agents.orchestrator_agent.services.rabbitmq_client import RabbitMQClient
 from agents.orchestrator_agent.config import config

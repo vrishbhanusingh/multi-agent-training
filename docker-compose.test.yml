@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U testuser -d orchestrator_test"]
+      test: [ "CMD-SHELL", "pg_isready -U testuser -d orchestrator_test" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,7 +23,7 @@ services:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
+      test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -77,7 +77,7 @@ services:
       LOG_LEVEL: INFO
     depends_on:
       - orchestrator
-      
+
   # Unit Test service
   unit-tests:
     build:
@@ -130,6 +130,24 @@ services:
     depends_on:
       - orchestrator
       - executor
+
+  # Query Flow Test service
+  query-flow-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      PYTHONPATH: /app
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql://testuser:testpassword@postgres:5432/orchestrator_test
+    command: python agents/orchestrator_agent/tests/test_query_flow.py
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      orchestrator:
+        condition: service_started
 
 volumes:
   postgres_test_data:

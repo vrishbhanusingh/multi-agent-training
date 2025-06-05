@@ -27,7 +27,7 @@ from sqlalchemy.dialects.postgresql import UUID as PostgresUUID, JSONB
 
 from agents.orchestrator_agent.domain.interfaces import QueryServiceInterface, DAGPlannerInterface, DAGStorageInterface
 from agents.orchestrator_agent.domain.models import Query, DAG
-from agents.orchestrator_agent.repositories.postgres_dag_storage import Base
+from agents.orchestrator_agent.services.repositories.postgres_dag_storage import Base
 from agents.orchestrator_agent.config import config
 
 # Initialize logging

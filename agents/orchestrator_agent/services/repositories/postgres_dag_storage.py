@@ -8,6 +8,7 @@ import time
 from contextlib import contextmanager
 from typing import Dict, List, Optional, Any, Generator, Tuple
 from uuid import UUID
+import uuid
 
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, DateTime, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PostgresUUID, JSONB
@@ -65,13 +66,13 @@ class TaskModel(Base):
     dag = relationship("DAGModel", back_populates="tasks")
 
 
-class TaskDependencyModel(Base):
-    """SQLAlchemy model for task dependencies."""
+class TaskDependency(Base):
+    """ORM model for task dependencies."""
     __tablename__ = "task_dependencies"
     
-    id = Column(PostgresUUID(as_uuid=True), primary_key=True)
-    upstream_task_id = Column(PostgresUUID(as_uuid=True), ForeignKey("tasks.id"))
-    downstream_task_id = Column(PostgresUUID(as_uuid=True), ForeignKey("tasks.id"))
+    id = Column(PostgresUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    upstream_task_id = Column(PostgresUUID(as_uuid=True), ForeignKey("tasks.id"), nullable=False)
+    downstream_task_id = Column(PostgresUUID(as_uuid=True), ForeignKey("tasks.id"), nullable=False)
 
 
 class PostgresDAGStorage(DAGStorageInterface):
@@ -166,39 +167,17 @@ class PostgresDAGStorage(DAGStorageInterface):
         
         try:
             with self.session_scope() as session:
-                # Check if DAG already exists (update)
-                existing_dag = session.query(DAGModel).filter(DAGModel.id == dag.id).first()
-                
-                if existing_dag:
-                    # Update existing DAG
-                    logger.debug(f"Updating existing DAG: {dag.id}")
-                    existing_dag.name = dag.name
-                    existing_dag.description = dag.description
-                    existing_dag.updated_at = dag.updated_at
-                    existing_dag.version += 1
-                    
-                    # Clear existing tasks and dependencies
-                    logger.debug(f"Clearing existing tasks for DAG: {dag.id}")
-                    session.query(TaskDependencyModel).filter(
-                        TaskDependencyModel.upstream_task_id.in_([t.id for t in session.query(TaskModel.id).filter(TaskModel.dag_id == dag.id)])
-                    ).delete(synchronize_session=False)
-                    session.query(TaskModel).filter(TaskModel.dag_id == dag.id).delete()
-                else:
-                    # Create new DAG
-                    logger.debug(f"Creating new DAG: {dag.id}")
-                    dag_model = DAGModel(
-                        id=dag.id,
-                        name=dag.name,
-                        description=dag.description,
-                        created_at=dag.created_at,
-                        updated_at=dag.updated_at,
-                        version=dag.version
-                    )
-                    session.add(dag_model)
+                # Create DAG model
+                dag_model = DAGModel(
+                    id=dag.id,
+                    name=dag.name,
+                    description=dag.description,
+                    created_at=dag.created_at,
+                    updated_at=dag.updated_at
+                )
                 
                 # Add tasks
-                for task_id, task in dag.tasks.items():
-                    logger.debug(f"Adding task {task_id} to DAG {dag.id}")
+                for task in dag.tasks.values():
                     task_model = TaskModel(
                         id=task.id,
                         dag_id=dag.id,
@@ -208,7 +187,7 @@ class PostgresDAGStorage(DAGStorageInterface):
                         parameters=task.parameters,
                         estimated_complexity=task.estimated_complexity,
                         required_capabilities=task.required_capabilities,
-                        status=task.status.value,
+                        status=task.status.value,  # Convert enum to string value
                         assigned_to=task.assigned_to,
                         created_at=task.created_at,
                         updated_at=task.updated_at,
@@ -216,23 +195,15 @@ class PostgresDAGStorage(DAGStorageInterface):
                         error=task.error,
                         timeout_seconds=task.timeout_seconds
                     )
-                    session.add(task_model)
+                    dag_model.tasks.append(task_model)
                 
-                # Add dependencies
-                for task_id, task in dag.tasks.items():
-                    for downstream_id in task._downstream_tasks:
-                        logger.debug(f"Adding dependency from task {task_id} to {downstream_id}")
-                        dependency = TaskDependencyModel(
-                            upstream_task_id=task_id,
-                            downstream_task_id=downstream_id
-                        )
-                        session.add(dependency)
-                
-            logger.info(f"Successfully saved DAG: {dag.id}")
-            return True
+                # Add to session and commit
+                session.add(dag_model)
+                logger.debug(f"Successfully saved DAG {dag.id}")
+                return True
         
         except Exception as e:
-            success, error_msg = self._handle_db_error(f"saving DAG {dag.id}", e)
+            success, _ = self._handle_db_error(f"saving DAG {dag.id}", e)
             return success
     
     def get_dag(self, dag_id: UUID) -> Optional[DAG]:
@@ -284,8 +255,8 @@ class PostgresDAGStorage(DAGStorageInterface):
                 task_ids = [task_model.id for task_model in task_models]
                 
                 if task_ids:  # Only query if we have tasks
-                    dependencies = session.query(TaskDependencyModel).filter(
-                        TaskDependencyModel.upstream_task_id.in_(task_ids)
+                    dependencies = session.query(TaskDependency).filter(
+                        TaskDependency.upstream_task_id.in_(task_ids)
                     ).all()
                     
                     for dep in dependencies:
@@ -335,8 +306,8 @@ class PostgresDAGStorage(DAGStorageInterface):
         """Update downstream tasks after a task completes."""
         try:
             # Find downstream tasks
-            dependencies = session.query(TaskDependencyModel).filter(
-                TaskDependencyModel.upstream_task_id == completed_task_id
+            dependencies = session.query(TaskDependency).filter(
+                TaskDependency.upstream_task_id == completed_task_id
             ).all()
             
             for dep in dependencies:
@@ -349,8 +320,8 @@ class PostgresDAGStorage(DAGStorageInterface):
                     continue
                 
                 # Find all upstream dependencies for this task
-                upstream_dependencies = session.query(TaskDependencyModel).filter(
-                    TaskDependencyModel.downstream_task_id == dep.downstream_task_id
+                upstream_dependencies = session.query(TaskDependency).filter(
+                    TaskDependency.downstream_task_id == dep.downstream_task_id
                 ).all()
                 
                 # Check if all upstream tasks are completed
