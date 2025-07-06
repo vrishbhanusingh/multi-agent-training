@@ -1,0 +1,25 @@
+# Task ID: 4
+# Title: Implement Agent Messaging Logic
+# Status: done
+# Dependencies: 2, 3
+# Priority: high
+# Description: Enable agents to send, receive, and broadcast messages via RabbitMQ.
+# Details:
+Agents use a topic exchange for direct and broadcast messaging. Each agent logs sent and received messages.
+
+# Test Strategy:
+Send test messages between agents and verify logs for correct receipt.
+
+# Subtasks:
+## 1. Direct messaging between agents [done]
+### Dependencies: None
+### Description: Implement point-to-point messaging capabilities between specific agents
+### Details:
+Create message routing logic using RabbitMQ topic exchanges with routing keys like 'agent.{agent_id}.direct'. Implement message serialization with JSON format, delivery confirmation, and timeout handling. Add message logging and debugging capabilities.
+
+## 2. Broadcast messaging to all agents [done]
+### Dependencies: None
+### Description: Implement broadcast messaging functionality for system-wide announcements
+### Details:
+Create broadcast mechanism using fanout exchange or topic exchange with 'broadcast' routing key. Implement message deduplication, acknowledgment tracking, and delivery status monitoring. Add support for different broadcast message types and priorities.
+

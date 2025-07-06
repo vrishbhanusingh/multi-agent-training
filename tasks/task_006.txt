@@ -1,0 +1,61 @@
+# Task ID: 6
+# Title: Automated Testing for Agents
+# Status: in-progress
+# Dependencies: 3, 4
+# Priority: high
+# Description: Add pytest-based tests for agent communication and integration, focusing on the orchestrator/executor architecture.
+# Details:
+Each agent (orchestrator and executor) has a tests/ directory with smoke and RabbitMQ integration tests. Tests should verify DAG-based workflow execution and proper communication between orchestrator and executor agents. A root script runs all tests in sequence, ensuring proper integration with Postgres, RabbitMQ, Docker, and K8s infrastructure.
+
+# Test Strategy:
+Run ./run_all_agent_tests.sh and verify all tests pass. Tests should cover both orchestrator and executor agents, their communication patterns, and DAG workflow execution.
+
+# Subtasks:
+## 1. Add smoke tests for each agent [done]
+### Dependencies: None
+### Description: Create basic smoke tests to verify agent startup and basic functionality
+### Details:
+Implement pytest-based smoke tests for agent_a, agent_b, agent_c, orchestrator_agent, and executor_agent. Tests should verify container startup, service connectivity, and basic health endpoints. Include Docker container health checks and service discovery validation.
+
+## 2. Add RabbitMQ integration tests [pending]
+### Dependencies: None
+### Description: Create tests for message passing between orchestrator and executor agents
+### Details:
+Test the message queue communication patterns between the orchestrator and executor agents, ensuring proper handling of task assignments and results reporting. Validate message delivery, acknowledgment, error handling, and retry mechanisms.
+
+## 3. Create run_all_agent_tests.sh script [pending]
+### Dependencies: None
+### Description: Script should run tests for both orchestrator and executor agents
+### Details:
+Ensure the script properly initializes test environments for both agent types and runs their respective test suites in the correct order. Include test result aggregation, failure reporting, and cleanup procedures.
+
+## 4. smoke-test [pending]
+### Dependencies: None
+### Description: Implement comprehensive smoke testing for the entire system
+### Details:
+Create end-to-end smoke tests that verify basic system functionality across all components. Test agent registration, basic message passing, and system health indicators. Include integration with CI/CD pipeline.
+
+## 5. Add DAG workflow execution tests [pending]
+### Dependencies: None
+### Description: Test the orchestrator's ability to manage DAG-based workflows
+### Details:
+Create tests that verify the orchestrator can properly parse, validate, and execute DAG-based workflows, dispatching tasks to executor agents and handling dependencies correctly. Include complex DAG scenarios and error recovery testing.
+
+## 6. Add infrastructure integration tests [pending]
+### Dependencies: None
+### Description: Test integration with Postgres, Docker, and K8s
+### Details:
+Create tests that verify agents can properly interact with the fixed external infrastructure components including Postgres for state persistence, Docker for containerization, and K8s for deployment. Include database migration testing and container orchestration validation.
+
+## 7. Implement performance and load testing framework [pending]
+### Dependencies: 6.2, 6.5
+### Description: Create comprehensive performance testing for the multi-agent system
+### Details:
+Implement load testing with multiple concurrent workflows, message throughput testing, and resource utilization monitoring. Create performance baselines and regression testing. Include stress testing for system limits and bottleneck identification.
+
+## 8. Add chaos engineering and resilience tests [pending]
+### Dependencies: 6.6, 6.7
+### Description: Implement chaos testing to validate system resilience under failure conditions
+### Details:
+Create chaos engineering tests that randomly inject failures (network partitions, service crashes, resource exhaustion). Verify system recovery, data consistency, and graceful degradation. Include disaster recovery testing and failover validation.
+

@@ -1,0 +1,31 @@
+# Task ID: 1
+# Title: Set up Docker Compose Infrastructure
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Provision RabbitMQ, Redis, and MCP server using Docker Compose.
+# Details:
+Create docker-compose.yml with services for RabbitMQ (with management UI), Redis (with persistence), and the MCP server (FastAPI). Expose necessary ports and configure health checks.
+
+# Test Strategy:
+Run 'docker compose up' and verify all services are healthy and accessible.
+
+# Subtasks:
+## 1. Create docker-compose.yml [done]
+### Dependencies: None
+### Description: Design and implement the main docker-compose configuration file for the multi-agent system infrastructure
+### Details:
+Create docker-compose.yml with services for RabbitMQ (with management UI on port 15672), Redis (with persistence enabled), and MCP server. Configure proper networking, volumes for data persistence, environment variables, and health checks for all services. Include restart policies and resource limits.
+
+## 2. Configure RabbitMQ and Redis services [done]
+### Dependencies: None
+### Description: Set up RabbitMQ message broker and Redis cache with production-ready configurations
+### Details:
+Configure RabbitMQ with custom exchanges, queues, and routing keys for agent communication. Set up Redis with persistence (AOF and RDB), memory optimization, and appropriate eviction policies. Configure authentication, monitoring, and backup strategies for both services.
+
+## 3. Add MCP server service [done]
+### Dependencies: None
+### Description: Integrate the Model Context Protocol server as a containerized service in the docker-compose setup
+### Details:
+Add MCP server configuration to docker-compose.yml with proper environment variables, port mapping (default 8000), volume mounts for configuration, and dependencies on RabbitMQ and Redis. Configure health checks and startup order to ensure dependent services are ready.
+

@@ -1,0 +1,61 @@
+# Task ID: 5
+# Title: Integrate Agent State and Memory with Redis
+# Status: done
+# Dependencies: 2, 3
+# Priority: medium
+# Description: Allow agents to store and retrieve state/memory via the MCP server and Redis.
+# Details:
+Implement endpoints and agent logic for state/memory management using Redis.
+
+# Test Strategy:
+Store and retrieve agent state/memory via API and verify persistence in Redis.
+
+# Subtasks:
+## 1. Design Redis schema for agent state [done]
+### Dependencies: None
+### Description: Define the data structure for storing agent state in Redis
+### Details:
+Create JSON schema with fields for agent ID, status, configuration, and runtime properties. Define Redis keys structure and TTL policies.
+
+## 2. Design Redis schema for agent memory [done]
+### Dependencies: 5.1
+### Description: Define the data structure for storing agent memory/history in Redis
+### Details:
+Create schema for storing message history, conversation context, and agent-specific memory entries. Consider time-based indexing and memory retention policies.
+
+## 3. Implement state endpoints in MCP server [done]
+### Dependencies: 5.1
+### Description: Add FastAPI endpoints for state management
+### Details:
+Add GET, PUT, DELETE endpoints for /agents/{agent_id}/state in server.py. Implement Redis operations in redis_client.py.
+
+## 4. Implement memory endpoints in MCP server [done]
+### Dependencies: 5.2
+### Description: Add FastAPI endpoints for memory management
+### Details:
+Add GET, PUT, DELETE endpoints for /agents/{agent_id}/memory in server.py. Implement Redis operations for list management in redis_client.py.
+
+## 5. Add state client functions in agents [done]
+### Dependencies: 5.3
+### Description: Implement state storage/retrieval in each agent
+### Details:
+Create redis_state.py in each agent with functions to store/retrieve state via MCP API. Add agent-specific state management logic.
+
+## 6. Add memory client functions in agents [done]
+### Dependencies: 5.4
+### Description: Implement memory storage/retrieval in each agent
+### Details:
+Create redis_memory.py in each agent with functions to store/retrieve memory via MCP API. Add agent-specific memory management logic.
+
+## 7. Add Gemini memory integration [done]
+### Dependencies: 5.6
+### Description: Ensure Gemini has context from agent memory
+### Details:
+Modify gemini_llm.py to incorporate relevant memory as context for the LLM. Add memory retrieval before prompt generation.
+
+## 8. Write integration tests [done]
+### Dependencies: 5.5, 5.6
+### Description: Create tests for state and memory functionality
+### Details:
+Add tests that verify state persistence and memory retrieval through API calls and agent interactions.
+

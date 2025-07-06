@@ -37,7 +37,7 @@ from typing import Optional
 
 from fastapi import FastAPI
 
-from agents.orchestrator_agent.controllers.api import app
+from agents.orchestrator_agent.controllers.api import app, initialize_services
 from agents.orchestrator_agent.services.repositories.postgres_dag_storage import PostgresDAGStorage
 from agents.orchestrator_agent.services.dag_planner import AdaptiveDagPlanner
 from agents.orchestrator_agent.services.query_service import QueryService
@@ -137,11 +137,20 @@ class OrchestratorAgent:
             # Step 3: Start background maintenance workers
             self.start_background_workers()
 
-            # Step 4: Register signal handlers for graceful shutdown
+            # Step 4: Initialize API services with our instances
+            initialize_services(
+                dag_storage_instance=self.dag_storage,
+                dag_planner_instance=self.dag_planner,
+                rabbitmq_client_instance=self.rabbitmq_client,
+                query_service_instance=self.query_service,
+                task_dispatcher_instance=self.task_dispatcher
+            )
+
+            # Step 5: Register signal handlers for graceful shutdown
             signal.signal(signal.SIGINT, self.handle_shutdown_signal)
             signal.signal(signal.SIGTERM, self.handle_shutdown_signal)
 
-            # Step 5: Start the FastAPI server (blocking call)
+            # Step 6: Start the FastAPI server (blocking call)
             logger.info(f"Starting API server on {config.api_host}:{config.api_port}")
             uvicorn.run(
                 app,

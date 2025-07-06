@@ -1,0 +1,31 @@
+# Task ID: 3
+# Title: Create Agent Containers (A, B, C)
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Set up agent_a, agent_b, and agent_c as independent Docker containers.
+# Details:
+Each agent has its own folder, Dockerfile, and Python script. Agents connect to RabbitMQ and Redis, declare their own queues, and listen for messages.
+
+# Test Strategy:
+Start all agent containers and verify they connect to RabbitMQ and declare queues.
+
+# Subtasks:
+## 1. Create agent_a container [done]
+### Dependencies: None
+### Description: Set up the first agent container with proper Docker configuration and networking
+### Details:
+Create agents/agent_a/ directory with Dockerfile, requirements.txt, and agent.py. Configure container to connect to RabbitMQ and Redis services. Implement basic agent lifecycle management, logging configuration, and health check endpoints.
+
+## 2. Create agent_b container [done]
+### Dependencies: None
+### Description: Set up the second agent container following the same patterns as agent_a
+### Details:
+Create agents/agent_b/ directory with consistent structure and configuration. Ensure unique agent identification and queue naming. Implement agent-specific behavior patterns and proper error handling for connection failures.
+
+## 3. Create agent_c container [done]
+### Dependencies: None
+### Description: Set up the third agent container completing the basic agent infrastructure
+### Details:
+Create agents/agent_c/ directory with standardized agent implementation. Implement consistent logging format across all agents. Add environment variable configuration for flexible deployment and testing scenarios.
+

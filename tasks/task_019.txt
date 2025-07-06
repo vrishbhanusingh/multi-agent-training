@@ -1,0 +1,132 @@
+# Task ID: 19
+# Title: Implement Generic and Specialized Executor Agents for Task Processing
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Design and develop executor agents that can poll, claim, execute, and update tasks from the DAG workflow system, with support for both generic and specialized task execution patterns.
+# Details:
+Create a modular executor agent system with the following components:
+
+1. **Core Executor Framework**:
+   - Implement a base executor class that handles common functionality: polling for tasks, claiming them with a locking mechanism, status updates, and result storage
+   - Design a pluggable task type handler system that allows specialized executors to register for specific task types
+   - Implement robust error handling with configurable retry policies, dead-letter queues for failed tasks, and detailed error logging
+
+2. **Task Polling and Claiming**:
+   - Develop polling mechanisms for both Postgres and RabbitMQ as task sources
+   - Implement an atomic claim operation that prevents multiple executors from processing the same task
+   - Add configurable polling intervals with exponential backoff when no tasks are available
+
+3. **Task Execution Engine**:
+   - Create a task context object that provides access to task parameters, dependencies, and results from upstream tasks
+   - Implement timeout handling for long-running tasks
+   - Add support for task cancellation when workflows are terminated
+
+4. **Result Management**:
+   - Design a standardized result format that can handle various data types including structured data, binary content, and references to external storage
+   - Implement efficient storage of large results using the Supabase Storage integration from Task 17
+
+5. **Specialized Executors**:
+   - Implement at least two specialized executor types:
+     a. A data processing executor for handling ETL-type operations
+     b. An API integration executor for external service calls
+   - Each specialized executor should extend the base executor and implement type-specific optimizations
+
+6. **Health Monitoring**:
+   - Add executor heartbeat mechanism to detect and recover from stalled executors
+   - Implement detailed metrics collection: tasks processed, execution times, error rates, etc.
+   - Create a self-diagnostic capability that can detect and report issues with the executor's environment
+
+The implementation should be containerized for easy deployment and scaling. Ensure compatibility with the orchestrator agent from Task 18 by adhering to the same DAG structure and task definition format.
+
+# Test Strategy:
+Testing should cover the following areas:
+
+1. **Unit Tests**:
+   - Test each component of the executor framework in isolation with mocked dependencies
+   - Verify correct behavior of the task claiming mechanism under concurrent scenarios
+   - Test error handling paths including retry logic and dead-letter queue functionality
+   - Validate proper cleanup of resources after task completion or failure
+
+2. **Integration Tests**:
+   - Set up a test environment with Postgres and RabbitMQ
+   - Create test DAGs with various task types and dependencies
+   - Verify end-to-end task execution flow from polling to result storage
+   - Test interaction with the orchestrator agent from Task 18
+   - Validate proper handling of the Supabase Storage integration for large results
+
+3. **Performance Tests**:
+   - Measure task throughput under various load conditions
+   - Test scaling behavior with multiple executor instances running concurrently
+   - Benchmark resource usage (CPU, memory, network I/O) during peak load
+
+4. **Resilience Tests**:
+   - Simulate network failures during task execution
+   - Test recovery from database connection issues
+   - Verify behavior when upstream dependencies fail or timeout
+   - Test executor restart scenarios with partially completed tasks
+
+5. **Specific Test Cases**:
+   - Verify that an executor correctly claims and executes a task when it becomes available
+   - Confirm that multiple executors don't process the same task simultaneously
+   - Test that task results are correctly stored and accessible to downstream tasks
+   - Verify that specialized executors handle their specific task types correctly
+   - Confirm that the executor properly handles task cancellation requests
+
+Implement a CI pipeline that runs these tests automatically, with particular emphasis on the resilience tests to ensure production reliability.
+
+# Subtasks:
+## 1. Design and Implement Core Executor Framework Architecture [pending]
+### Dependencies: None
+### Description: Create the foundational architecture for the executor agent system with base classes and interfaces
+### Details:
+Design and implement the BaseExecutor class with core functionality for task polling, claiming, execution, and result reporting. Create interfaces for TaskHandler, TaskContext, and ExecutorConfig. Implement dependency injection container for pluggable components.
+
+## 2. Implement Task Polling and Atomic Claiming Mechanism [pending]
+### Dependencies: 19.1
+### Description: Create robust task polling system with atomic claiming to prevent duplicate processing
+### Details:
+Implement PostgreSQL-based task polling with SELECT FOR UPDATE for atomic claiming. Add RabbitMQ consumer alternative for task distribution. Implement exponential backoff for idle periods and configurable polling intervals with jitter.
+
+## 3. Build Task Execution Engine with Context Management [pending]
+### Dependencies: 19.1, 19.2
+### Description: Create the core execution engine that processes tasks with proper context and dependency handling
+### Details:
+Implement TaskContext for accessing parameters and dependencies. Add timeout handling with configurable limits. Create task cancellation mechanism and cleanup procedures. Implement progress tracking and intermediate result storage.
+
+## 4. Implement Result Management and Storage Integration [pending]
+### Dependencies: 19.3
+### Description: Create comprehensive result handling with support for various data types and storage backends
+### Details:
+Design standardized result format with metadata. Integrate with Supabase Storage for large results. Implement result caching and compression. Add result validation and integrity checking with checksums.
+
+## 5. Develop Specialized Executor Implementations [pending]
+### Dependencies: 19.4
+### Description: Create specialized executor types for data processing and API integration use cases
+### Details:
+Implement DataProcessingExecutor for ETL operations with pandas/numpy integration. Create APIIntegrationExecutor for external service calls with retry logic and rate limiting. Add file processing capabilities and validation frameworks.
+
+## 6. Implement Error Handling and Retry Mechanisms [pending]
+### Dependencies: 19.3, 19.5
+### Description: Create comprehensive error handling with configurable retry policies and dead-letter queues
+### Details:
+Implement configurable retry policies with exponential backoff. Create dead-letter queue for failed tasks. Add error categorization and reporting. Implement circuit breakers for external dependencies.
+
+## 7. Add Health Monitoring and Metrics Collection [pending]
+### Dependencies: 19.6
+### Description: Implement comprehensive monitoring, metrics collection, and self-diagnostic capabilities
+### Details:
+Add heartbeat mechanism with configurable intervals. Implement Prometheus metrics for task processing rates, execution times, and error rates. Create health check endpoints and self-diagnostic routines for environment validation.
+
+## 8. Create Containerization and Deployment Configuration [pending]
+### Dependencies: 19.7
+### Description: Package executor agents for containerized deployment with proper configuration management
+### Details:
+Create optimized Dockerfiles for executor agents. Implement environment-based configuration. Add Kubernetes manifests with resource limits and scaling policies. Create docker-compose configuration for development.
+
+## 9. Implement Integration Testing and Performance Validation [pending]
+### Dependencies: 19.8
+### Description: Create comprehensive test suites for integration testing and performance validation
+### Details:
+Build integration test framework with test orchestrator and mock services. Implement load testing with multiple concurrent executors. Add chaos testing for resilience validation. Create performance benchmarking and profiling tools.
+

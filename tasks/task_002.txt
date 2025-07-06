@@ -1,0 +1,31 @@
+# Task ID: 2
+# Title: Implement MCP Server (FastAPI)
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Develop the MCP server with endpoints for agent management and messaging.
+# Details:
+Build FastAPI app with endpoints for health, agent state/memory, registration, message sending, and broadcast. Integrate with Redis and RabbitMQ.
+
+# Test Strategy:
+Use curl or HTTP client to verify all endpoints work as expected.
+
+# Subtasks:
+## 1. Implement health and registration endpoints [done]
+### Dependencies: None
+### Description: Create REST API endpoints for health monitoring and agent registration in the MCP server
+### Details:
+Implement GET /health endpoint with dependency checks for RabbitMQ and Redis connectivity. Create POST /agents/register endpoint for agent registration with validation. Add GET /agents endpoint to list registered agents with status information.
+
+## 2. Integrate Redis for state/memory [done]
+### Dependencies: None
+### Description: Implement Redis client integration for persistent state and memory management
+### Details:
+Create redis_client.py with connection pooling, error handling, and retry logic. Implement methods for storing/retrieving agent state, session management, and memory persistence. Add data serialization/deserialization with JSON and pickle support.
+
+## 3. Integrate RabbitMQ for messaging [done]
+### Dependencies: None
+### Description: Implement RabbitMQ client for reliable message passing between agents
+### Details:
+Create rabbitmq_client.py with connection management, channel pooling, and automatic reconnection. Implement topic exchanges for routing, message publishing/consuming, and dead letter queue handling. Add message serialization and error handling.
+

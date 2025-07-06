@@ -1,0 +1,43 @@
+# Task ID: 7
+# Title: Set Up Testing Agent for Communication Verification
+# Status: pending
+# Dependencies: 3, 4
+# Priority: medium
+# Description: Create a dedicated testing agent container for scripted communication tests to verify the DAG-based workflow communication.
+# Details:
+Add agents/testing_agent/ with a Dockerfile and test_send.py script. Use it to send messages to all agents and verify receipt. The testing agent should be configured to work with externally managed Postgres and RabbitMQ services. Tests should verify communication channels between orchestrator, executor agents, and external services in the DAG-based workflow.
+
+# Test Strategy:
+Run test_send.py from the testing agent and check agent logs for message receipt. Verify successful communication with externally managed services. Test the complete message flow through the DAG-based workflow.
+
+# Subtasks:
+## 1. Create testing_agent container [pending]
+### Dependencies: None
+### Description: Create a Docker container for the testing agent that connects to externally managed services
+### Details:
+Create Dockerfile in agents/testing_agent/ that includes necessary dependencies for testing. Configure the container to connect to externally managed Postgres and RabbitMQ services.
+
+## 2. Implement test_send.py script [pending]
+### Dependencies: None
+### Description: Create script to test DAG-based workflow communication
+### Details:
+Implement a test script that verifies communication between orchestrator and executor agents. Include tests for message passing through RabbitMQ and data persistence in Postgres. Ensure the script can validate the complete DAG workflow execution path.
+
+## 3. Update docker-compose.yml for testing agent [pending]
+### Dependencies: None
+### Description: Add testing agent to docker-compose configuration
+### Details:
+Update docker-compose.yml to include the testing agent container. Configure it to connect to the externally managed Postgres and RabbitMQ services. Ensure proper network configuration for communication with other agents.
+
+## 4. Create Kubernetes manifest for testing agent [pending]
+### Dependencies: None
+### Description: Develop K8s configuration for the testing agent
+### Details:
+Create Kubernetes manifest files for deploying the testing agent. Configure appropriate service connections to externally managed Postgres and RabbitMQ. Set up proper resource limits and environment variables.
+
+## 5. Document testing agent setup and usage [pending]
+### Dependencies: None
+### Description: Create documentation for the testing agent
+### Details:
+Document how to deploy and use the testing agent for verifying communication in the DAG-based workflow. Include examples of test commands and expected results. Update related infrastructure documentation.
+

@@ -1,0 +1,73 @@
+# Task ID: 8
+# Title: Document Architecture and Usage
+# Status: pending
+# Dependencies: 1, 2, 3, 4, 5, 6, 7
+# Priority: medium
+# Description: Write clear documentation for system architecture, agent setup, and testing, including the DAG-based workflow with orchestrator and executor agents.
+# Details:
+Update README.md and project_logs/ with architecture diagrams, setup instructions, and usage examples. Include detailed documentation on the DAG-based workflow, orchestrator and executor agents, and their interactions with Postgres and RabbitMQ.
+
+# Test Strategy:
+Review documentation for completeness and clarity. Ensure it accurately reflects the DAG-based workflow and testing procedures for orchestrator and executor agents.
+
+# Subtasks:
+## 1. Create system architecture diagram [pending]
+### Dependencies: None
+### Description: Create visual representation of system components
+### Details:
+Draw diagram showing RabbitMQ, Redis, MCP Server, and Agent containers with their connections and message flows. Include the DAG-based workflow with orchestrator and executor agents. Use a tool like draw.io or Mermaid.
+
+## 2. Write system overview section [pending]
+### Dependencies: 8.1
+### Description: Add high-level explanation of multi-agent system
+### Details:
+Update README.md with system purpose, components, and how they work together. Include basic architecture explanation with emphasis on the DAG-based workflow and the roles of orchestrator and executor agents.
+
+## 3. Document environment setup [pending]
+### Dependencies: None
+### Description: Add setup and configuration instructions
+### Details:
+Document environment variables, prerequisites, and step-by-step setup instructions in README.md. Include Postgres configuration for the DAG-based workflow.
+
+## 4. Document agent capabilities [pending]
+### Dependencies: None
+### Description: Explain what each agent does and how they interact
+### Details:
+Create agent_capabilities.md describing each agent's purpose, behavior, and communication patterns. Add detailed sections for orchestrator agent (DAG generation) and executor agents (task polling and execution).
+
+## 5. Document Gemini integration [pending]
+### Dependencies: None
+### Description: Explain how Gemini is used for agent thinking
+### Details:
+Document the integration with Google Gemini, including setup, prompt patterns, and how it's used in each agent. Include specific examples for orchestrator and executor agents.
+
+## 6. Create usage examples [pending]
+### Dependencies: 8.2
+### Description: Provide examples of common operations
+### Details:
+Create examples directory with scripts and explanations for common tasks like messaging between agents or using the testing agent. Add examples for DAG creation, task execution, and status updates in the new workflow.
+
+## 7. Document testing procedures [pending]
+### Dependencies: None
+### Description: Explain how to run tests and verify functionality
+### Details:
+Document all test types, how to run them, and what successful output looks like. Include specific sections on testing the orchestrator and executor agents, DAG generation, task execution, and error handling.
+
+## 8. Create API documentation [pending]
+### Dependencies: None
+### Description: Document MCP server API endpoints
+### Details:
+Create API.md with all endpoints, request/response formats, and example usage. Include endpoints related to DAG workflow management and task status updates.
+
+## 9. Document DAG workflow architecture [pending]
+### Dependencies: 8.1, 8.2
+### Description: Create detailed documentation for the DAG-based workflow
+### Details:
+Create dag_workflow.md explaining the directed acyclic graph (DAG) architecture, how tasks are represented, dependencies managed, and how the orchestrator generates and manages the workflow.
+
+## 10. Document Postgres integration [pending]
+### Dependencies: 8.9
+### Description: Explain how Postgres is used for task storage and management
+### Details:
+Document the database schema, tables, and how Postgres is used to store task information, track status, and manage the DAG workflow. Include diagrams of the database structure.
+

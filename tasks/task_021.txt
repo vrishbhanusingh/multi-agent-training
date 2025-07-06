@@ -1,0 +1,126 @@
+# Task ID: 21
+# Title: Enhance OrchestratorAgent with Correction Mode and DAG Surgery Capabilities
+# Status: pending
+# Dependencies: 18, 20
+# Priority: high
+# Description: Upgrade the existing OrchestratorAgent to include intelligent error analysis, self-correction prompting, and dynamic DAG modification capabilities that enable the system to learn from failures and automatically generate corrective action plans.
+# Details:
+Transform the OrchestratorAgent from a simple workflow planner into a self-improving system capable of learning from errors. This enhancement builds the core intelligence of the Adaptive Orchestration Loop:
+
+1. **Error Detection and Analysis System**:
+   - Implement periodic monitoring of task statuses in the database
+   - Create sophisticated error categorization (syntax errors, missing dependencies, resource issues, logic errors)
+   - Build error context gathering that collects all relevant information about failures
+   - Add pattern recognition to identify recurring error types
+
+2. **Self-Correction Prompting Engine**:
+   - Design a structured prompt generation system for LLM-based error analysis
+   - Implement context assembly that combines:
+     * Original user intent and workflow goals
+     * Failed task description and error details
+     * Historical context of successful tasks in the workflow
+     * System capabilities and constraints
+   - Create prompt templates for different error categories
+   - Add confidence scoring for generated correction plans
+
+3. **DAG Surgery Implementation**:
+   - Develop atomic operations for DAG modification:
+     * Pause failed tasks without disrupting dependent tasks
+     * Insert new corrective task sequences
+     * Rewire dependencies to incorporate fixes
+     * Resume workflow execution after corrections
+   - Implement transaction handling to ensure DAG consistency
+   - Add validation to prevent invalid DAG states after modifications
+
+4. **Correction Mode State Machine**:
+   - Implement a state machine that transitions between:
+     * Normal execution mode (dispatching original tasks)
+     * Error analysis mode (gathering context and generating solutions)
+     * Correction execution mode (running corrective tasks)
+     * Learning mode (updating policies based on outcomes)
+   - Add proper state persistence and recovery mechanisms
+
+5. **LLM Integration for Plan Generation**:
+   - Integrate with Claude/GPT for generating corrective action plans
+   - Implement prompt engineering best practices for consistent, actionable outputs
+   - Add result parsing and validation for generated correction plans
+   - Include safety mechanisms to prevent infinite correction loops
+
+6. **Learning Integration Preparation**:
+   - Implement experience logging for state-action-reward tuples
+   - Create data structures for storing correction attempts and outcomes
+   - Add hooks for future RL training loop integration
+
+The enhanced orchestrator should maintain backward compatibility while adding these intelligent capabilities as optional features that can be enabled/disabled via configuration.
+
+# Test Strategy:
+Testing should verify both the correctness of the correction logic and its integration with the existing orchestrator:
+
+1. **Unit Tests**:
+   - Test error detection logic with various failure scenarios
+   - Verify DAG surgery operations maintain graph validity
+   - Test prompt generation for different error types
+   - Validate state machine transitions and persistence
+
+2. **Integration Tests**:
+   - Test correction mode with simulated task failures
+   - Verify LLM integration produces valid correction plans
+   - Test complete correction cycles from error detection to resolution
+   - Validate that corrected workflows execute successfully
+
+3. **DAG Surgery Tests**:
+   - Test insertion of corrective tasks into various DAG topologies
+   - Verify dependency rewiring maintains execution order
+   - Test atomic operations under concurrent access
+   - Validate rollback capabilities for failed corrections
+
+4. **End-to-End Correction Tests**:
+   - Create test scenarios with known fixable errors (missing files, incorrect parameters)
+   - Verify the system can detect, analyze, and correct these errors automatically
+   - Test with complex DAGs having multiple potential failure points
+   - Measure correction success rates and identify improvement areas
+
+5. **Performance and Safety Tests**:
+   - Test correction mode performance impact on normal workflow execution
+   - Verify prevention of infinite correction loops
+   - Test resource usage during intensive LLM-based planning
+   - Validate graceful degradation when correction attempts fail
+
+6. **Learning Preparation Tests**:
+   - Verify experience logging captures all necessary data for future RL training
+   - Test data structure integrity for correction attempts and outcomes
+   - Validate hooks for RL integration work correctly
+
+Success criteria: 80%+ automatic correction success rate for common error types, <30 second average correction planning time, zero DAG corruption incidents.
+
+# Subtasks:
+## 1. Implement error detection and monitoring system [pending]
+### Dependencies: None
+### Description: Create sophisticated error detection that monitors task statuses and categorizes failures
+### Details:
+Add periodic database polling for failed tasks, implement error categorization logic, and create context gathering mechanisms that collect all relevant failure information.
+
+## 2. Build self-correction prompting engine with LLM integration [pending]
+### Dependencies: 21.1
+### Description: Create the core intelligence system that generates corrective action plans
+### Details:
+Implement structured prompt generation, integrate with Claude/GPT APIs, add result parsing and validation, and create safety mechanisms to prevent infinite loops.
+
+## 3. Implement DAG surgery operations and transaction handling [pending]
+### Dependencies: 21.2
+### Description: Create atomic operations for safely modifying DAGs during correction
+### Details:
+Implement task pausing, corrective task insertion, dependency rewiring, and validation. Add comprehensive transaction handling to ensure DAG consistency.
+
+## 4. Build correction mode state machine and persistence [pending]
+### Dependencies: 21.3
+### Description: Implement the orchestrator's enhanced state management for correction cycles
+### Details:
+Create state machine for execution/analysis/correction modes, add state persistence for recovery, and implement proper transition logic between modes.
+
+## 5. Add experience logging and RL preparation hooks [pending]
+### Dependencies: 21.4
+### Description: Implement data collection for future reinforcement learning integration
+### Details:
+Create logging for state-action-reward tuples, implement data structures for correction attempts and outcomes, and add hooks for future RL training integration.
+

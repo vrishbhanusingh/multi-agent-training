@@ -1,0 +1,161 @@
+# Task ID: 11
+# Title: Implement A2A Protocol Format over RabbitMQ
+# Status: in-progress
+# Dependencies: None
+# Priority: medium
+# Description: Enhance agent communication by implementing Google's Agent-to-Agent (A2A) protocol format over the existing RabbitMQ infrastructure to standardize message formats while maintaining the current message broker architecture.
+# Details:
+This task involves adapting our current RabbitMQ messaging system to use Google's A2A protocol format for all agent communications. Key implementation steps include:
+
+1. Study the A2A protocol specification to understand message structure, required fields, and encoding requirements.
+2. Create serialization/deserialization utilities for A2A message format (likely using Protocol Buffers).
+3. Develop adapter classes that convert between our internal message representations and A2A format.
+4. Update the messaging service layer to encode outgoing messages in A2A format before publishing to RabbitMQ.
+5. Modify message consumers to properly decode A2A messages upon receipt.
+6. Implement proper error handling for malformed messages.
+7. Ensure backward compatibility during transition period by supporting both old and new formats.
+8. Update configuration to enable/disable A2A protocol usage.
+9. Optimize message processing to minimize performance impact.
+10. Ensure all required A2A metadata fields are properly populated (timestamps, message IDs, agent identifiers, etc.).
+
+The implementation should maintain all existing RabbitMQ connection management, queue declarations, and routing logic while changing only the message format.
+
+# Test Strategy:
+Testing should verify correct implementation of the A2A protocol format while ensuring system functionality remains intact:
+
+1. Unit tests:
+   - Test serialization/deserialization of A2A messages with various payload types
+   - Verify correct handling of all A2A message fields
+   - Test error handling for malformed messages
+
+2. Integration tests:
+   - Verify end-to-end message delivery between agents using A2A format
+   - Test backward compatibility with agents not yet upgraded to A2A
+   - Measure performance impact and ensure it meets requirements
+
+3. Validation tests:
+   - Validate messages against A2A schema/specification
+   - Verify all required metadata fields are correctly populated
+   - Test with different message sizes and types
+
+4. System tests:
+   - Run existing agent communication test suite with A2A enabled
+   - Verify no regression in functionality
+   - Test failover and recovery scenarios
+
+5. Performance tests:
+   - Benchmark message throughput before and after implementation
+   - Measure serialization/deserialization overhead
+
+All tests should be automated and included in the CI pipeline.
+
+# Subtasks:
+## 1. Create A2A Protocol Message Models and Serialization Utilities [in-progress]
+### Dependencies: None
+### Description: Implement the core A2A protocol message models and serialization/deserialization utilities using Protocol Buffers based on Google's A2A specification.
+### Details:
+Implementation steps:
+1. Study the A2A protocol specification to understand message structure and required fields
+2. Define Protocol Buffer (.proto) files that match the A2A message format specification
+3. Generate code from .proto files for serialization/deserialization
+4. Create utility classes for common A2A message operations (creation, validation, field access)
+5. Implement helper methods to generate required A2A metadata (timestamps, UUIDs, etc.)
+6. Write unit tests for serialization/deserialization to ensure compatibility with the A2A specification
+7. Test with sample A2A messages to verify format compliance
+
+Testing approach:
+- Unit test each serialization/deserialization function with various message types
+- Verify generated messages conform to A2A specification
+- Test edge cases like empty messages, maximum field sizes, and special characters
+
+## 2. Develop A2A Message Adapter Layer [pending]
+### Dependencies: 11.1
+### Description: Create adapter classes that convert between internal message representations and A2A format, ensuring seamless translation between existing system messages and the new protocol.
+### Details:
+Implementation steps:
+1. Design adapter interfaces that define conversion between internal messages and A2A format
+2. Implement concrete adapter classes for each message type used in the system
+3. Create mapping logic to translate internal message fields to appropriate A2A fields
+4. Implement reverse mapping from A2A messages back to internal format
+5. Add validation to ensure all required A2A fields are properly populated
+6. Handle special cases where internal message structure doesn't directly map to A2A
+7. Implement error handling for conversion failures
+
+Testing approach:
+- Unit test each adapter with various message types
+- Verify bidirectional conversion preserves all message data
+- Test with edge cases and invalid messages
+- Create integration tests that verify end-to-end conversion
+
+## 3. Update Message Publishing Service for A2A Format [pending]
+### Dependencies: 11.1, 11.2
+### Description: Modify the existing message publishing service to encode outgoing messages in A2A format before sending them to RabbitMQ, while maintaining all current connection and routing logic.
+### Details:
+Implementation steps:
+1. Identify all message publishing code paths in the current system
+2. Modify the message publishing service to use the A2A adapters before sending messages
+3. Implement configuration options to enable/disable A2A protocol usage
+4. Add message headers or metadata to indicate A2A format is being used
+5. Ensure all required A2A metadata fields are properly populated (agent identifiers, etc.)
+6. Implement performance optimizations to minimize overhead
+7. Add logging for A2A message publishing events
+
+Testing approach:
+- Unit test the publishing service with A2A encoding enabled
+- Measure performance impact of A2A encoding
+- Create integration tests that verify messages are properly published to RabbitMQ
+- Test configuration options for enabling/disabling A2A format
+
+## 4. Update Message Consumers for A2A Format Handling [pending]
+### Dependencies: 11.1, 11.2, 11.3
+### Description: Modify message consumers to properly decode A2A formatted messages upon receipt from RabbitMQ, with backward compatibility for existing message formats during transition.
+### Details:
+Implementation steps:
+1. Identify all message consumer code paths in the current system
+2. Implement message format detection to distinguish between A2A and legacy formats
+3. Add A2A message decoding logic to all consumers using the adapter layer
+4. Implement error handling for malformed A2A messages
+5. Add logging for A2A message reception and processing
+6. Ensure backward compatibility by supporting both formats during transition
+7. Optimize message processing to minimize performance impact
+
+Testing approach:
+- Unit test consumers with both A2A and legacy message formats
+- Test error handling with malformed messages
+- Create integration tests that verify end-to-end message processing
+- Test backward compatibility scenarios
+- Verify performance meets requirements
+
+## 5. Implement Agent Cards and System-wide A2A Integration [pending]
+### Dependencies: 11.1, 11.2, 11.3, 11.4
+### Description: Complete the A2A implementation by adding Agent Cards support, system-wide integration, monitoring, and documentation for the new protocol format.
+### Details:
+Implementation steps:
+1. Implement Agent Cards as defined in the A2A specification
+2. Create agent identity management to properly populate agent information in messages
+3. Add system-wide configuration for A2A protocol settings
+4. Implement monitoring and metrics for A2A message processing
+5. Create comprehensive documentation for the A2A implementation
+6. Develop migration guide for transitioning existing integrations to A2A
+7. Create examples and templates for common A2A message patterns
+8. Implement end-to-end tests across the entire messaging system
+
+Testing approach:
+- End-to-end testing of the complete A2A implementation
+- Verify Agent Cards functionality works as expected
+- Test system behavior under various configuration settings
+- Validate monitoring and metrics accuracy
+- Perform load testing to ensure system handles A2A messages at scale
+
+## 6. Add A2A Protocol Performance Optimization and Caching [pending]
+### Dependencies: 11.5
+### Description: Implement performance optimizations for A2A message processing including caching, connection pooling, and message batching
+### Details:
+Implement message caching layer for frequently used A2A templates, connection pooling for Protocol Buffer operations, and message batching for high-throughput scenarios. Add performance monitoring and optimization based on real-world usage patterns.
+
+## 7. Implement A2A Protocol Security and Validation Framework [pending]
+### Dependencies: 11.5, 11.6
+### Description: Add comprehensive security measures and validation framework for A2A message processing
+### Details:
+Implement message signature validation, agent authentication within A2A messages, and comprehensive input validation. Add rate limiting, message size restrictions, and protection against malformed or malicious A2A messages.
+

@@ -1,0 +1,115 @@
+# Task ID: 20
+# Title: Implement EvaluatorAgent for Task Outcome Assessment and Reward Assignment
+# Status: pending
+# Dependencies: 2, 3, 4
+# Priority: high
+# Description: Design and develop the EvaluatorAgent that subscribes to task results from RabbitMQ, validates task outputs, calculates rewards, and updates the database with structured feedback to enable the reinforcement learning loop.
+# Details:
+The EvaluatorAgent serves as the impartial judge in the Adaptive Orchestration Loop, translating raw executor results into structured feedback and quantitative reward signals. Key implementation components:
+
+1. **RabbitMQ Integration**:
+   - Subscribe to the 'task_results_queue' to receive executor results
+   - Implement message acknowledgment and error handling
+   - Add connection recovery and retry mechanisms
+
+2. **Output Validation Framework**:
+   - Create a pluggable validation system that dispatches based on executor_type
+   - Implement validators for common task types: code_executor, file_writer, api_caller
+   - Add support for custom validation rules based on task metadata
+   - Include content validation (checking file existence, API response codes, etc.)
+
+3. **Reward Calculation Engine**:
+   - Implement a sophisticated reward function with multiple components:
+     * Base rewards: +1.0 for successful tasks, -1.0 for failures
+     * Retry bonuses: +1.5 for tasks that succeed after retries (demonstrates learning)
+     * Complexity bonuses: Higher rewards for successfully completing complex tasks
+     * Speed penalties: Reduced rewards for tasks that exceed expected duration
+   - Add configurable reward parameters for fine-tuning
+
+4. **Structured Feedback Generation**:
+   - Create JSONB feedback structures that capture:
+     * Validation results and confidence scores
+     * Error analysis with categorization (syntax, logic, resource, network, etc.)
+     * Performance metrics (execution time, resource usage)
+     * Suggestions for improvement when applicable
+   - Implement feedback summarization for human-readable reports
+
+5. **Database Integration**:
+   - Update task records with reward scores and feedback_notes
+   - Implement transaction handling to ensure data consistency
+   - Add batch processing for high-throughput scenarios
+   - Include retry logic for database connection issues
+
+6. **Learning Analytics**:
+   - Track reward distribution patterns over time
+   - Identify trends in task success rates by type and complexity
+   - Generate insights for orchestrator improvement
+
+The EvaluatorAgent should be designed as a stateless microservice that can be scaled horizontally as the system grows.
+
+# Test Strategy:
+Comprehensive testing should verify the evaluator's accuracy, reliability, and performance:
+
+1. **Unit Tests**:
+   - Test reward calculation with various task outcomes and retry scenarios
+   - Verify validation logic for different task types with known good/bad outputs
+   - Test feedback generation with edge cases (malformed results, missing data)
+   - Validate database update operations with mock connections
+
+2. **Integration Tests**:
+   - Set up test RabbitMQ environment and verify message consumption
+   - Test end-to-end flow from executor result to database update
+   - Verify interaction with actual task result messages from executor agents
+   - Test database transaction handling under concurrent load
+
+3. **Validation Accuracy Tests**:
+   - Create a test suite with known task results (both successful and failed)
+   - Measure validation accuracy against human expert judgments
+   - Test edge cases like partially successful tasks or ambiguous outputs
+   - Verify that validation confidence scores correlate with actual accuracy
+
+4. **Performance Tests**:
+   - Measure processing time for various result types and sizes
+   - Test throughput with simulated high-volume task completion scenarios
+   - Verify memory usage remains stable during extended operation
+   - Test scaling behavior with multiple evaluator instances
+
+5. **Reliability Tests**:
+   - Simulate RabbitMQ connection failures and verify recovery
+   - Test behavior during database outages with proper error handling
+   - Verify that no messages are lost during system restarts
+   - Test with malformed or corrupted task result messages
+
+Success criteria: 95%+ validation accuracy, <100ms average processing time per result, zero message loss during normal operations.
+
+# Subtasks:
+## 1. Set up EvaluatorAgent service structure and RabbitMQ integration [pending]
+### Dependencies: None
+### Description: Create the basic service architecture and implement robust RabbitMQ message consumption
+### Details:
+Create agents/evaluator_agent/ directory with proper service structure. Implement RabbitMQ consumer that subscribes to task_results_queue with error handling, connection recovery, and message acknowledgment patterns.
+
+## 2. Implement output validation framework with pluggable validators [pending]
+### Dependencies: 20.1
+### Description: Create a flexible validation system that can handle different task types
+### Details:
+Design and implement a ValidationEngine with pluggable validators for code_executor, file_writer, api_caller types. Include content validation, error categorization, and confidence scoring.
+
+## 3. Build reward calculation engine with configurable parameters [pending]
+### Dependencies: 20.2
+### Description: Implement sophisticated reward function with multiple components
+### Details:
+Create RewardCalculator with base rewards, retry bonuses, complexity adjustments, and speed penalties. Make parameters configurable via environment variables or config files.
+
+## 4. Implement structured feedback generation and database updates [pending]
+### Dependencies: 20.3
+### Description: Create feedback structures and database integration for storing evaluations
+### Details:
+Design JSONB feedback schemas, implement feedback generation logic, and create database update operations with transaction handling and batch processing capabilities.
+
+## 5. Add learning analytics and monitoring capabilities [pending]
+### Dependencies: 20.4
+### Description: Implement analytics tracking and monitoring for the evaluation process
+### Details:
+Create analytics collection for reward patterns, success rate trends, and evaluation performance. Add monitoring dashboards and alerting for evaluation system health.
+

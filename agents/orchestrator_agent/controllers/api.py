@@ -46,12 +46,27 @@ from agents.orchestrator_agent.config import config
 # Initialize logging
 logger = logging.getLogger(__name__)
 
-# Initialize services
-dag_storage = PostgresDAGStorage()
-dag_planner = AdaptiveDagPlanner()
-rabbitmq_client = RabbitMQClient()
-query_service = QueryService(dag_storage=dag_storage, dag_planner=dag_planner)
-task_dispatcher = TaskDispatcher(dag_storage=dag_storage, rabbitmq_client=rabbitmq_client)
+# Global service instances (to be injected by main application)
+dag_storage = None
+dag_planner = None
+rabbitmq_client = None
+query_service = None
+task_dispatcher = None
+
+def initialize_services(
+    dag_storage_instance: DAGStorageInterface,
+    dag_planner_instance: DAGPlannerInterface,
+    rabbitmq_client_instance,
+    query_service_instance: QueryServiceInterface,
+    task_dispatcher_instance: TaskDispatcherInterface
+):
+    """Initialize services for dependency injection."""
+    global dag_storage, dag_planner, rabbitmq_client, query_service, task_dispatcher
+    dag_storage = dag_storage_instance
+    dag_planner = dag_planner_instance
+    rabbitmq_client = rabbitmq_client_instance
+    query_service = query_service_instance
+    task_dispatcher = task_dispatcher_instance
 
 # Initialize FastAPI app
 app = FastAPI(

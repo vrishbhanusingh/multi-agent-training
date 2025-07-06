@@ -1,0 +1,513 @@
+# Task ID: 18
+# Title: Implement Orchestrator Agent with DAG-based Workflow Planning
+# Status: in-progress
+# Dependencies: None
+# Priority: high
+# Description: Design and develop the orchestrator agent that receives user queries, plans workflows as Directed Acyclic Graphs (DAGs), and makes these DAGs available to executor agents through a well-defined interface.
+# Details:
+The orchestrator agent should be implemented as a standalone service with the following components and capabilities:
+
+1. **Query Reception Interface**:
+   - Create a REST API endpoint or message queue consumer to receive user queries/requests
+   - Implement request validation and sanitization
+   - Support synchronous and asynchronous query submission patterns
+   - Include authentication and authorization mechanisms
+
+2. **DAG Planning Engine**:
+   - Develop a workflow planner that decomposes user queries into discrete tasks
+   - Implement logic to determine dependencies between tasks
+   - Generate a formal DAG representation with nodes (tasks) and edges (dependencies)
+   - Include metadata for each task (estimated complexity, required capabilities, etc.)
+   - Handle edge cases like circular dependencies or invalid requests
+
+3. **DAG Storage and Distribution**:
+   - Implement a Postgres schema for storing DAGs, tasks, and their relationships
+   - Alternatively/additionally, set up a RabbitMQ topic for publishing DAG updates
+   - Create a versioning mechanism for DAGs to track changes
+   - Implement transaction handling to ensure DAG consistency
+
+4. **Task Dispatch Interface**:
+   - Create an API or message interface for executor agents to retrieve tasks
+   - Implement mechanisms for executors to report task completion/failure
+   - Include task prioritization logic
+   - Support task reassignment in case of execution failures
+
+5. **Monitoring and Logging**:
+   - Implement comprehensive logging of DAG creation and modifications
+   - Create metrics for orchestration performance (planning time, execution time)
+   - Add tracing capabilities to track workflow execution across the system
+
+The implementation should follow clean architecture principles with clear separation between:
+- Domain logic (DAG planning)
+- Infrastructure concerns (storage, messaging)
+- Interface adapters (APIs, message handlers)
+
+Use dependency injection to ensure components are testable and loosely coupled. Document all interfaces thoroughly to ensure executor agents can be developed independently.
+
+# Test Strategy:
+Testing should cover all aspects of the orchestrator agent:
+
+1. **Unit Tests**:
+   - Test DAG generation logic with various query types
+   - Verify correct dependency resolution
+   - Test edge cases (empty queries, complex dependencies, etc.)
+   - Validate error handling and input validation
+
+2. **Integration Tests**:
+   - Test Postgres schema with actual DAG storage and retrieval
+   - Verify RabbitMQ publishing and consumption if implemented
+   - Test API endpoints with mock clients
+   - Validate transaction handling and data consistency
+
+3. **System Tests**:
+   - Create end-to-end tests with mock executor agents
+   - Simulate complete workflows from query submission to task completion
+   - Test recovery from simulated failures
+   - Verify correct handling of concurrent requests
+
+4. **Performance Tests**:
+   - Measure DAG generation time for queries of varying complexity
+   - Test system under load with multiple concurrent requests
+   - Verify database performance with large DAGs
+   - Measure message throughput if using message queues
+
+5. **Specific Test Cases**:
+   - Simple linear workflow (A → B → C)
+   - Complex DAG with multiple branches and joins
+   - DAG with high fan-out (one task spawning many parallel tasks)
+   - DAG with high fan-in (many tasks converging to a single task)
+   - Invalid query that should be rejected
+   - Query that generates a DAG with isolated tasks (no dependencies)
+
+Implement CI pipeline to run tests automatically. Create a test harness that allows manual testing of the orchestrator through its API interfaces.
+
+# Subtasks:
+## 1. Implement Query Reception Interface and Core Domain Models [done]
+### Dependencies: None
+### Description: Create the REST API endpoints for receiving user queries and implement the core domain models for the orchestrator, including DAG representation structures.
+### Details:
+Implementation steps:
+1. Set up a new service with a clean architecture structure (controllers, services, repositories, domain models)
+2. Create domain models for:
+   - Query (representing user requests)
+   - Task (atomic unit of work)
+   - DAG (collection of tasks with dependencies)
+   - TaskStatus (enum for tracking execution state)
+3. Implement a REST controller with endpoints for:
+   - POST /api/queries - Submit new queries (both sync and async patterns)
+   - GET /api/queries/{id} - Retrieve query status
+   - GET /api/queries/{id}/dag - Retrieve the generated DAG for a query
+4. Implement request validation middleware/filters to sanitize inputs
+5. Add basic authentication using JWT tokens
+6. Set up comprehensive logging using a structured logging framework
+7. Write unit tests for domain models and controllers
+8. Integration test the API endpoints with mock services
+
+Testing approach:
+- Unit test domain models to ensure they correctly represent the business logic
+- Test API endpoints using mock services
+- Verify authentication and validation logic works correctly
+- Test both synchronous and asynchronous query patterns
+
+## 2. Develop DAG Planning Engine and Storage [pending]
+### Dependencies: 18.1
+### Description: Implement the core planning logic that transforms user queries into DAGs and create the storage mechanisms for persisting these DAGs.
+### Details:
+Implementation steps:
+1. Create a DAGPlanner service that:
+   - Analyzes user queries to identify required tasks
+   - Determines dependencies between tasks
+   - Constructs a valid DAG representation
+   - Assigns metadata to tasks (complexity, capabilities needed)
+   - Validates the DAG for circular dependencies
+2. Implement a PostgreSQL schema for storing:
+   - Queries
+   - DAGs
+   - Tasks
+   - Task dependencies
+   - Execution status
+3. Create repository classes for DAG persistence with:
+   - CRUD operations for DAGs and tasks
+   - Transaction handling to ensure data consistency
+   - Versioning mechanism for tracking DAG changes
+4. Implement a service layer that connects the planner with storage
+5. Add comprehensive error handling for edge cases:
+   - Invalid queries
+   - Circular dependencies
+   - Resource constraints
+6. Create database migrations for the schema
+7. Implement unit and integration tests
+
+Testing approach:
+- Unit test the DAG planning logic with various query scenarios
+- Test edge cases like circular dependencies and invalid inputs
+- Integration test the database repositories with an in-memory or test database
+- Verify transaction handling works correctly for complex DAG updates
+
+## 3. Implement Task Dispatch Interface and Monitoring [pending]
+### Dependencies: 18.1, 18.2
+### Description: Create the interfaces for executor agents to retrieve tasks and report completion status, along with comprehensive monitoring and metrics collection.
+### Details:
+Implementation steps:
+1. Implement a TaskDispatcher service that:
+   - Provides tasks to executor agents based on dependencies
+   - Handles task completion/failure reports
+   - Implements task prioritization logic
+   - Supports task reassignment for failed executions
+2. Create REST endpoints for executor agents:
+   - GET /api/tasks/available - Retrieve available tasks
+   - PUT /api/tasks/{id}/status - Update task status
+   - GET /api/dags/{id} - Retrieve full DAG information
+3. Implement a RabbitMQ integration (optional alternative):
+   - Set up task queues for different task types
+   - Create publishers for task distribution
+   - Implement consumers for status updates
+4. Add comprehensive monitoring:
+   - Implement metrics collection for planning and execution times
+   - Create dashboards for system performance
+   - Set up alerting for failed workflows
+5. Implement distributed tracing:
+   - Add trace IDs to track workflow execution across components
+   - Integrate with a tracing system (Jaeger, Zipkin, etc.)
+6. Create documentation for all interfaces
+7. Implement integration tests for the complete workflow
+
+Testing approach:
+- Unit test the task dispatcher logic
+- Integration test the executor agent interfaces
+- Test the complete workflow from query submission to task completion
+- Verify metrics collection and monitoring works correctly
+- Load test the system with multiple concurrent workflows
+
+## 4. Implement Advanced DAG Features and Optimization [pending]
+### Dependencies: 18.3
+### Description: Add advanced DAG capabilities including dynamic task generation, conditional execution, and performance optimization for complex workflows.
+### Details:
+Implementation steps:
+1. Add support for dynamic task generation:
+   - Implement runtime task creation based on previous task results
+   - Add conditional task execution based on upstream outcomes
+   - Create dynamic workflow branching capabilities
+2. Implement advanced workflow patterns:
+   - Map-reduce operations for parallel data processing
+   - Loop constructs for iterative task execution
+   - Subworkflow support for modular workflow composition
+3. Add workflow optimization:
+   - Implement critical path analysis for execution optimization
+   - Add resource-aware task scheduling
+   - Create intelligent task batching for similar operations
+4. Implement workflow versioning and migration:
+   - Add support for multiple workflow versions
+   - Create migration tools for updating running workflows
+   - Implement rollback capabilities for failed migrations
+
+Testing approach:
+- Test dynamic task generation with various scenarios
+- Verify conditional execution logic works correctly
+- Performance test workflow optimization algorithms
+- Test workflow versioning and migration procedures
+
+## 5. Build High Availability and Scaling Infrastructure [pending]
+### Dependencies: 18.3, 18.4
+### Description: Implement orchestrator clustering, horizontal scaling, and high availability features for production deployment.
+### Details:
+Implementation steps:
+1. Implement orchestrator clustering:
+   - Add leader election mechanism for multiple orchestrator instances
+   - Implement distributed consensus for workflow state management
+   - Create cluster state synchronization mechanisms
+2. Add horizontal scaling capabilities:
+   - Implement automatic scaling based on workflow load
+   - Create load balancing for DAG planning requests
+   - Add resource monitoring and capacity planning
+3. Implement high availability features:
+   - Add failover mechanisms for orchestrator failures
+   - Implement workflow state backup and recovery
+   - Create disaster recovery procedures
+4. Add security and authentication:
+   - Implement role-based access control for workflow management
+   - Add audit logging for all orchestrator operations
+   - Create secure communication channels between components
+
+Testing approach:
+- Test orchestrator clustering under various failure scenarios
+- Verify horizontal scaling triggers and effectiveness
+- Test failover and recovery mechanisms
+- Security testing for authentication and authorization
+
+## 6. Create Orchestrator Management UI and Analytics Dashboard [in-progress]
+### Dependencies: 18.5
+### Description: Develop a comprehensive management interface and analytics dashboard for workflow monitoring and control.
+### Details:
+Implementation steps:
+1. Create web-based management interface:
+   - Workflow submission and management forms
+   - Real-time workflow execution visualization
+   - DAG editing and validation interface
+   - Task status monitoring and control panels
+2. Implement analytics dashboard:
+   - Workflow performance metrics and trends
+   - Resource utilization analysis
+   - Error rate monitoring and diagnostics
+   - Historical workflow analysis and reporting
+3. Add workflow debugging tools:
+   - Step-by-step execution viewer
+   - Task output inspection capabilities
+   - Error investigation and debugging interfaces
+   - Performance profiling and bottleneck identification
+4. Create administrative tools:
+   - System configuration management
+   - User and permission management
+   - System health monitoring dashboard
+   - Backup and maintenance utilities
+
+Testing approach:
+- UI/UX testing for workflow management interfaces
+- Performance testing for dashboard responsiveness
+- Accessibility testing for user interface compliance
+- Integration testing with orchestrator API endpoints
+
+<info added on 2025-07-06T15:19:04.467Z>
+## Technical Implementation Details
+
+### Dashboard Architecture
+- **State Management**: Implemented Redux with Redux Toolkit for global state management
+- **API Layer**: Created custom React Query hooks with automatic retry logic and stale-while-revalidate caching
+- **Authentication**: JWT-based auth with refresh token rotation and secure HttpOnly cookies
+
+### Component Implementation Details
+- **DAGVisualization**:
+  ```typescript
+  // Custom node renderer with execution status
+  const CustomNode = ({ data, isConnectable }: NodeProps) => {
+    const statusColor = getStatusColor(data.status);
+    return (
+      <div className={`node ${statusColor} p-3 rounded-md shadow-md`}>
+        <div className="font-semibold">{data.label}</div>
+        <div className="text-xs">{data.status}</div>
+        <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
+        <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
+      </div>
+    );
+  };
+  ```
+
+- **Analytics Component**:
+  - Integrated Chart.js with React for performance metrics visualization
+  - Implemented time-series data aggregation with customizable time windows
+  - Added export functionality for metrics data (CSV, JSON)
+
+### Performance Optimizations
+- Implemented virtualized lists for large task collections using `react-window`
+- Added debounced search functionality for task filtering
+- Implemented incremental loading for historical workflow data
+- Added memoization for expensive component renders
+
+### Backend Integration
+- Created WebSocket connection for real-time updates:
+  ```typescript
+  const useTaskUpdates = (workflowId: string) => {
+    const [tasks, setTasks] = useState<Task[]>([]);
+    
+    useEffect(() => {
+      const ws = new WebSocket(`ws://localhost:8000/api/workflows/${workflowId}/tasks/live`);
+      
+      ws.onmessage = (event) => {
+        const updatedTask = JSON.parse(event.data);
+        setTasks(prev => prev.map(task => 
+          task.id === updatedTask.id ? updatedTask : task
+        ));
+      };
+      
+      return () => ws.close();
+    }, [workflowId]);
+    
+    return tasks;
+  };
+  ```
+
+### Testing Infrastructure
+- Added Cypress E2E tests for critical user flows
+- Implemented MSW (Mock Service Worker) for API mocking during component tests
+- Created snapshot tests for UI components with Jest and React Testing Library
+</info added on 2025-07-06T15:19:04.467Z>
+
+<info added on 2025-07-06T15:33:55.322Z>
+## Dark Mode Implementation
+
+### Core Implementation
+```typescript
+// DarkModeToggle.tsx
+const DarkModeToggle = () => {
+  const [darkMode, setDarkMode] = useState(false);
+  
+  useEffect(() => {
+    // Check localStorage on mount
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(isDark);
+    if (isDark) document.documentElement.classList.add('dark');
+  }, []);
+  
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem('darkMode', newDarkMode.toString());
+    
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+  
+  return (
+    <button 
+      onClick={toggleDarkMode}
+      className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+      aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      {darkMode ? (
+        <SunIcon className="h-5 w-5 text-yellow-400" />
+      ) : (
+        <MoonIcon className="h-5 w-5 text-gray-600" />
+      )}
+    </button>
+  );
+};
+```
+
+### Tailwind Configuration
+```javascript
+// tailwind.config.js
+module.exports = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'dark-bg': '#0f172a',
+        'dark-surface': '#1e293b',
+        'dark-elevated': '#334155',
+      },
+    },
+  },
+  // ...
+}
+```
+
+### Component Styling Examples
+```tsx
+// Dashboard component dark mode styling
+<div className="flex flex-col h-screen bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100 transition-colors duration-200">
+  <header className="bg-white dark:bg-dark-surface shadow-sm border-b border-gray-200 dark:border-gray-700">
+    {/* Header content */}
+  </header>
+  
+  <main className="flex-1 p-6 overflow-auto">
+    {/* Dashboard content */}
+  </main>
+</div>
+
+// Chart component with dark mode support
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: {
+        color: darkMode ? '#f1f5f9' : '#334155',
+      },
+    },
+  },
+  scales: {
+    x: {
+      grid: {
+        color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      },
+      ticks: {
+        color: darkMode ? '#cbd5e1' : '#64748b',
+      },
+    },
+    y: {
+      grid: {
+        color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      },
+      ticks: {
+        color: darkMode ? '#cbd5e1' : '#64748b',
+      },
+    },
+  },
+};
+```
+
+### Accessibility Considerations
+- All color combinations meet WCAG AA contrast requirements in both themes
+- Focus states remain clearly visible in dark mode with custom focus rings
+- Interactive elements maintain distinct hover/active states in dark mode
+- Status indicators use appropriate luminance values for dark backgrounds
+- SVG icons have appropriate color adjustments for dark mode visibility
+
+### ReactFlow Dark Theme Integration
+```typescript
+// Custom ReactFlow dark theme
+const reactFlowDarkTheme = {
+  bg: '#1e293b',
+  nodeBg: '#334155',
+  nodeColor: '#f8fafc',
+  nodeBorder: '#475569',
+  nodeSelectedBorder: '#38bdf8',
+  edgeStroke: '#94a3b8',
+  connectionLineStroke: '#94a3b8',
+};
+
+// Apply theme conditionally
+<ReactFlow
+  nodes={nodes}
+  edges={edges}
+  nodeTypes={nodeTypes}
+  className="bg-white dark:bg-dark-surface transition-colors duration-200"
+  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+  theme={darkMode ? reactFlowDarkTheme : undefined}
+>
+  {/* ReactFlow content */}
+</ReactFlow>
+```
+</info added on 2025-07-06T15:33:55.322Z>
+
+## 7. Implement Fixed Environment Resource Management [pending]
+### Dependencies: 18.1
+### Description: Define and implement standardized resource allocation for consistent multi-agent execution environments to ensure predictable performance and enable stable reinforcement learning.
+### Details:
+Implementation steps:
+1. Define fixed environment resource specifications:
+   - Standardize compute resources (CPU, memory) per environment class
+   - Set fixed LLM API quotas and rate limits per environment
+   - Define database connection pool sizes and query limits
+   - Specify network bandwidth and timeout configurations
+2. Implement environment health monitoring:
+   - Create resource utilization tracking and alerting
+   - Add environment health checks for all components
+   - Implement automatic resource cleanup and garbage collection
+   - Monitor LLM token usage and enforce quotas
+3. Create environment provisioning automation:
+   - Develop Docker container resource limits and reservations
+   - Implement Kubernetes resource quotas and limits
+   - Add environment startup validation and readiness checks
+   - Create environment teardown and cleanup procedures
+4. Add environment configuration management:
+   - Implement environment class definitions (small, medium, large)
+   - Create configuration templates for different environment sizes
+   - Add environment variable management for resource settings
+   - Implement hot-reload capabilities for configuration changes
+5. Integrate with orchestration layer:
+   - Connect environment allocation with DAG execution planning
+   - Implement environment-aware task scheduling
+   - Add environment resource consideration to task assignment
+   - Create fallback mechanisms for environment resource exhaustion
+
+Testing approach:
+- Unit tests for resource allocation and monitoring logic
+- Integration tests with actual container resource limits
+- Load testing to verify environment stability under stress
+- Performance tests to measure consistency across identical environments
+- Resource exhaustion tests to verify quota enforcement
+

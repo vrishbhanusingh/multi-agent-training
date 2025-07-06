@@ -1,0 +1,245 @@
+# Task ID: 12
+# Title: Implement Orchestration Layer with DAG Execution
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Develop a comprehensive orchestration system using Directed Acyclic Graphs (DAGs) for task decomposition and execution coordination between agents, serving as the planning and coordination mechanism for complex multi-agent workflows.
+# Details:
+Create an orchestration layer that uses DAGs to model and execute complex workflows across multiple agents. The implementation should:
+
+1. Define a DAG data structure with nodes representing individual agent tasks and edges representing dependencies and data flow between tasks.
+2. Implement a DAG parser that can convert workflow definitions (in YAML or JSON format) into executable DAG structures.
+3. Create a DAG execution engine that:
+   - Determines the correct execution order based on dependencies
+   - Handles parallel execution of independent tasks
+   - Manages data passing between dependent tasks
+   - Provides status tracking for in-progress workflows
+   - Implements error handling and recovery mechanisms
+4. Develop a workflow definition language/schema that allows for:
+   - Specifying agent assignments for each task
+   - Defining input/output parameters for tasks
+   - Setting conditional execution paths
+   - Configuring timeout and retry policies
+5. Integrate with the A2A protocol implementation (Task #11) to:
+   - Use standardized message formats for inter-agent communication
+   - Leverage the existing RabbitMQ infrastructure for message passing
+6. Implement workflow persistence to allow for recovery from system failures
+7. Create monitoring interfaces to track workflow execution progress
+8. Provide APIs for:
+   - Workflow submission
+   - Workflow status querying
+   - Workflow cancellation/modification
+   - Historical workflow analysis
+9. Refactor the MCP server to support the orchestrator agent and executor agents in the DAG-based workflow system
+
+The orchestration layer should be designed as a separate service that coordinates but doesn't directly implement agent functionality.
+
+# Test Strategy:
+Testing should verify both the correctness and performance of the orchestration layer:
+
+1. Unit Tests:
+   - Test DAG data structure operations (adding nodes/edges, cycle detection, topological sorting)
+   - Test workflow parser with valid and invalid workflow definitions
+   - Test execution engine components in isolation with mocked dependencies
+
+2. Integration Tests:
+   - Create test workflows with mock agents that verify:
+     - Simple linear workflows execute in correct order
+     - Parallel execution paths work correctly
+     - Conditional branching functions as expected
+     - Data is correctly passed between dependent tasks
+   - Test integration with A2A protocol by verifying message format compliance
+   - Verify workflow persistence and recovery mechanisms
+   - Test refactored MCP server endpoints for orchestrator and executor agent interactions
+
+3. Performance Tests:
+   - Measure throughput with varying numbers of concurrent workflows
+   - Test with large complex DAGs (100+ nodes) to verify scalability
+   - Measure latency of workflow operations (submission, status queries, etc.)
+
+4. Failure Recovery Tests:
+   - Simulate agent failures during workflow execution
+   - Test system recovery after orchestration service restart
+   - Verify timeout handling and retry mechanisms
+
+5. End-to-End Tests:
+   - Create realistic multi-agent workflows that accomplish meaningful tasks
+   - Verify entire system functions correctly with real (not mocked) agents
+   - Test the complete flow from query submission to orchestrator to execution by executor agents
+
+All tests should be automated and included in the CI/CD pipeline.
+
+# Subtasks:
+## 1. Define DAG Data Structure and Workflow Schema [pending]
+### Dependencies: None
+### Description: Create the core data structures for representing DAGs and develop a comprehensive workflow definition schema in YAML/JSON format.
+### Details:
+Implementation details:
+1. Design a DAG class with nodes (tasks) and edges (dependencies)
+2. Implement node properties including: id, agent assignment, input/output parameters, timeout settings, retry policies
+3. Implement edge properties for data flow between nodes
+4. Create a JSON schema for workflow definitions that includes:
+   - Task definitions with agent assignments
+   - Dependency relationships
+   - Input/output parameter specifications
+   - Conditional execution paths
+   - Timeout and retry configurations
+5. Add validation methods to ensure DAG integrity (no cycles, proper connections)
+6. Document the schema with examples
+
+Testing approach:
+- Unit tests for DAG data structure operations
+- Validation tests with sample workflow definitions
+- Tests to verify cycle detection and validation logic
+
+## 2. Implement DAG Parser and Serialization [pending]
+### Dependencies: 12.1
+### Description: Develop a parser that converts workflow definitions in YAML/JSON to executable DAG structures and vice versa.
+### Details:
+Implementation details:
+1. Create a parser class that converts workflow definition files (YAML/JSON) into DAG objects
+2. Implement validation during parsing to catch structural and semantic errors
+3. Add helpful error messages for invalid workflow definitions
+4. Develop serialization functionality to convert DAG objects back to YAML/JSON
+5. Implement versioning support for workflow definitions
+6. Create utility functions for common DAG operations (finding roots, leaves, paths)
+
+Testing approach:
+- Unit tests with various workflow definition examples
+- Error handling tests with malformed inputs
+- Roundtrip tests (parse then serialize) to verify data integrity
+- Performance tests with large workflow definitions
+
+## 3. Develop DAG Execution Engine Core [pending]
+### Dependencies: 12.1, 12.2
+### Description: Build the core execution engine that processes DAGs, determines execution order, and manages task state transitions.
+### Details:
+Implementation details:
+1. Create an execution engine class that takes a DAG as input
+2. Implement topological sorting to determine execution order
+3. Develop a state management system for tracking task status (pending, running, completed, failed)
+4. Build a scheduler that identifies ready-to-run tasks based on dependency completion
+5. Implement parallel execution capability for independent tasks
+6. Create a data passing mechanism between dependent tasks
+7. Add execution context to maintain workflow state
+8. Implement basic timeout handling
+
+Testing approach:
+- Unit tests for topological sorting and scheduling logic
+- Integration tests with mock tasks to verify execution order
+- Tests for parallel execution capabilities
+- Tests for data passing between tasks
+- Timeout and cancellation tests
+
+## 4. Integrate with A2A Protocol and Implement Agent Task Execution [pending]
+### Dependencies: 12.3
+### Description: Connect the execution engine with the A2A protocol to enable communication with agents for task execution.
+### Details:
+Implementation details:
+1. Create an adapter layer between the execution engine and A2A protocol
+2. Implement task dispatch functionality using RabbitMQ infrastructure
+3. Develop message formats for task assignment, status updates, and results
+4. Create agent task wrappers that handle communication details
+5. Implement response handling and task completion detection
+6. Add support for agent-specific parameters and configurations
+7. Develop timeout and heartbeat mechanisms for agent tasks
+8. Implement retry logic for failed agent communications
+
+Testing approach:
+- Integration tests with mock agents
+- Tests for message format compatibility
+- Timeout and retry scenario tests
+- Tests for handling various agent response types
+- Performance tests with multiple concurrent agent tasks
+
+## 5. Implement Workflow Persistence and Recovery [pending]
+### Dependencies: 12.3, 12.4
+### Description: Develop persistence mechanisms to store workflow state and enable recovery from failures.
+### Details:
+Implementation details:
+1. Design a persistence model for storing workflow state
+2. Implement database schema for workflows, tasks, and execution history
+3. Create a persistence service that periodically saves workflow state
+4. Develop checkpoint mechanisms at critical execution points
+5. Implement recovery logic to resume workflows after system failures
+6. Add transaction support for state updates to prevent corruption
+7. Create archiving functionality for completed workflows
+8. Implement cleanup policies for old workflow data
+
+Testing approach:
+- Unit tests for persistence operations
+- Recovery tests simulating system failures
+- Database transaction tests
+- Performance tests for state saving operations
+- Integration tests for the full persistence and recovery cycle
+
+## 6. Create API Layer and Monitoring Interfaces [pending]
+### Dependencies: 12.3, 12.4, 12.5
+### Description: Develop external APIs for workflow management and monitoring interfaces for tracking execution progress.
+### Details:
+Implementation details:
+1. Design RESTful API endpoints for:
+   - Workflow submission
+   - Workflow status querying
+   - Workflow cancellation/modification
+   - Historical workflow analysis
+2. Implement API controllers and request validation
+3. Create a real-time monitoring system using WebSockets for live updates
+4. Develop dashboard views for:
+   - Active workflow visualization
+   - Task status and progress tracking
+   - Error and warning displays
+   - Performance metrics
+5. Implement filtering and search capabilities for workflows
+6. Add authentication and authorization for API access
+7. Create detailed logging throughout the system
+8. Develop exportable reports for workflow analytics
+
+Testing approach:
+- API endpoint tests with various request scenarios
+- Authentication and authorization tests
+- WebSocket communication tests
+- UI component tests for monitoring interfaces
+- Load testing for API endpoints
+- End-to-end tests for complete workflow lifecycle
+
+## 7. Refactor MCP Server for DAG Orchestration [pending]
+### Dependencies: 12.3, 12.4, 12.6
+### Description: Adapt the MCP server to support the orchestrator agent in generating and managing DAGs, and executor agents in fetching and updating task statuses.
+### Details:
+Implementation details:
+1. Refactor MCP server endpoints to support:
+   - Submitting queries to the orchestrator agent
+   - Monitoring DAG execution progress
+   - Retrieving workflow results
+   - Managing executor agent task assignments
+2. Remove direct multi-agent coordination functionalities now handled by the orchestrator
+3. Implement new API endpoints for:
+   - Orchestrator agent to register and update DAG structures
+   - Executor agents to fetch assigned tasks and update their status
+   - Clients to monitor overall DAG progress
+4. Update authentication and authorization mechanisms to accommodate the new role-based access (orchestrator vs executor agents)
+5. Implement efficient data transfer mechanisms for DAG structures between MCP and orchestrator
+6. Create caching mechanisms for frequently accessed workflow status information
+7. Develop comprehensive logging for debugging and auditing purposes
+8. Update API documentation to reflect the new DAG-based workflow architecture
+
+Testing approach:
+- Unit tests for new and modified API endpoints
+- Integration tests with mock orchestrator and executor agents
+- Performance tests for DAG transfer and status update operations
+- Security tests for proper role-based access control
+- End-to-end tests simulating complete workflows from query submission to result retrieval
+
+## 8. Implement DAG Optimization and Performance Tuning [pending]
+### Dependencies: 12.4, 12.5
+### Description: Add optimization algorithms for DAG execution including parallel execution analysis, resource allocation optimization, and performance bottleneck detection.
+### Details:
+Implement DAG optimization algorithms to minimize execution time through intelligent task scheduling, resource allocation, and critical path analysis. Add performance monitoring and automatic scaling triggers for optimal resource utilization.
+
+## 9. Add Advanced DAG Features and Conditional Logic [pending]
+### Dependencies: 12.7, 12.8
+### Description: Implement advanced DAG features including conditional branching, loops, dynamic task generation, and complex workflow patterns.
+### Details:
+Add support for conditional execution paths, iterative task execution, dynamic DAG modification during runtime, and complex workflow patterns like map-reduce operations. Implement workflow templates and parameterization capabilities.
+

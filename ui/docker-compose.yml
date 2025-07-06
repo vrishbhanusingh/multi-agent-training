@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://orchestrator:8000
+    command: npm run dev
+    networks:
+      - multi-agent-training_default
+
+networks:
+  multi-agent-training_default:
+    external: true
