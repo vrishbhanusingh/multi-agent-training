@@ -18,6 +18,7 @@ COPY . .
 EXPOSE 8000
 EXPOSE 8001
 EXPOSE 10000
+EXPOSE 10001
 
 # Command to run the application
 CMD ["uvicorn", "mcp.server:app", "--host", "0.0.0.0", "--port", "8000"] 
